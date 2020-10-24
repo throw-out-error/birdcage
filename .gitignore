@@ -1,6 +1,5 @@
 node_modules
 .cache
 dist
-404.html
 config/*.json
 !config/sample.json
