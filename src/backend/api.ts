@@ -38,7 +38,7 @@ export function registerAPI(
             res.json({ success: true });
         } catch (err) {
             log.main.error(`Error setting password: ${err.toString()}`);
-            res.json({ success: false, error: err.toString() });
+            return res.json({ success: false, error: err.toString() });
         }
     });
 
@@ -49,19 +49,19 @@ export function registerAPI(
                 if (req.session) req.session.authed = true;
                 res.json({ success: true });
             } else
-                res.json({
+                return res.json({
                     success: false,
                     error: "Wrong password!",
                 });
         } catch (err) {
             log.main.error(`Error checking password: ${err.toString()}`);
-            res.json({ success: false, error: err.toString() });
+            return res.json({ success: false, error: err.toString() });
         }
     });
 
     router.delete("/auth", async (req, res) => {
         if (!checkAuth(req))
-            res.json({ success: false, error: "Not logged in!" });
+            return res.json({ success: false, error: "Not logged in!" });
 
         if (req.session) req.session.authed = false;
 
@@ -88,7 +88,7 @@ export function registerAPI(
             res.json({ success: true });
         } catch (err) {
             log.main.error(`Error adding route: ${err.toString()}`);
-            res.json({ success: false, error: err.toString() });
+            return res.json({ success: false, error: err.toString() });
         }
     });
 
@@ -103,7 +103,7 @@ export function registerAPI(
             res.json({ success: true });
         } catch (err) {
             log.main.error(`Error adding route: ${err.toString()}`);
-            res.json({ success: false, error: err.toString() });
+            return res.json({ success: false, error: err.toString() });
         }
     });
 
@@ -118,7 +118,7 @@ export function registerAPI(
             res.json({ success: true });
         } catch (err) {
             log.main.error(`Error deleting route: ${err.toString()}`);
-            res.json({ success: false, error: err.toString() });
+            return res.json({ success: false, error: err.toString() });
         }
     });
 }
