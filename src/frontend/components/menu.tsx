@@ -6,7 +6,7 @@ export interface MenuProps {
     fullscreen: boolean;
 }
 
-interface MenuState {}
+type MenuState = Record<string, unknown>;
 
 export class Menu extends Component<MenuProps, MenuState> {
     renderItem(href: string, title: string, className = "") {

@@ -4,7 +4,7 @@ import { Route } from "../../shared/admin-api";
 import { RouteEntry } from "./route";
 import { AddRoute } from "./addroute";
 
-export interface RoutesProps {}
+export type RoutesProps = Record<string, unknown>;
 interface RoutesState {
     routes: Route[];
     input_source: string;

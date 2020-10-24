@@ -24,7 +24,7 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
 
     async onDelete() {
         const { source, target } = this.props.route;
-        const { data } = await api.delete<"/routes/:source/:target">(
+        const { data } = await api.delete(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
                 target
             )}`
@@ -38,7 +38,7 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
 
     async onUpdate() {
         const { source, target } = this.props.route;
-        const { data } = await api.put<"/routes/:source/:target">(
+        const { data } = await api.put(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
                 target
             )}`,
