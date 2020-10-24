@@ -1,0 +1,71 @@
+{
+    "name": "birdcage",
+    "version": "0.0.1",
+    "description": "",
+    "main": "birdcage.js",
+    "license": "MIT",
+    "files": [
+        "dist/",
+        "src/"
+    ],
+    "bin": {
+        "birdcage": "birdcage.js"
+    },
+    "scripts": {
+        "dev": "npm run dev-backend & npm run dev-frontend",
+        "build": "npm run build-backend && npm run build-frontend",
+        "build-clean": "npm run clear && npm run build",
+        "start": "node birdcage.js",
+        "build-backend": "cross-env NODE_ENV=production tsc --project tsconfig.backend.json",
+        "dev-backend": "parcel watch src/backend/main.ts --out-dir ./dist/  --target node",
+        "build-frontend": "cross-env NODE_ENV=production parcel build src/frontend/*.html --public-url . --out-dir ./dist/www/",
+        "dev-frontend": "parcel watch src/frontend/*.html --public-url . --out-dir ./dist/www/",
+        "clear": "rimraf .cache & rimraf dist"
+    },
+    "browserslist": [
+        "last 2 Chrome versions"
+    ],
+    "devDependencies": {
+        "@types/bcrypt": "^3.0.0",
+        "@types/connect-redis": "0.0.14",
+        "@types/express": "^4.17.8",
+        "@types/express-session": "^1.17.0",
+        "@types/node": "^14.14.2",
+        "@typescript-eslint/eslint-plugin": "^4.5.0",
+        "@typescript-eslint/parser": "^4.5.0",
+        "cross-env": "^7.0.2",
+        "cssnano": "^4.1.10",
+        "eslint": "^7.11.0",
+        "eslint-config-prettier": "^6.14.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "listr2": "^3.1.1",
+        "node-sass": "^4.14.1",
+        "parcel-bundler": "^1.12.4",
+        "prettier": "^2.1.2",
+        "rimraf": "^3.0.2",
+        "ts-loader": "^8.0.6",
+        "ts-node": "^9.0.0",
+        "typescript": "^4.0.3"
+    },
+    "dependencies": {
+        "@toes/core": "dev",
+        "axios": "^0.21.0",
+        "bcrypt": "^5.0.0",
+        "chalk": "^4.1.0",
+        "connect-redis": "^5.0.0",
+        "express": "^4.17.1",
+        "express-session": "^1.17.1",
+        "handy-redis": "^2.0.1",
+        "plumbing-toolkit": "^1.2.0",
+        "preact": "^10.5.5",
+        "preact-router": "^3.2.1",
+        "pretty-json-stringify": "0.0.2",
+        "redbird": "^0.10.0",
+        "routing-controllers": "^0.9.0-alpha.6"
+    },
+    "alias": {
+        "shared": "./src/shared",
+        "frontend": "./src/frontend",
+        "backend": "./src/backend"
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "newLine": "LF",
+        "target": "esnext",
+        "sourceMap": true,
+        "pretty": true,
+        "jsx": "react",
+        "jsxFactory": "h",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "removeComments": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "declaration": false,
+        "lib": ["esnext", "dom"],
+        "outDir": "dist",
+        "baseUrl": ".",
+        "paths": {
+            "shared/*": ["/src/shared/*"],
+            "frontend/*": ["/src/frontend/*"],
+            "backend/*": ["/src/backend/*"]
+        }
+    },
+    "exclude": ["types", "node_modules"]
+}
