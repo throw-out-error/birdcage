@@ -8,9 +8,9 @@ export class RouteStorage {
     routes: Route[] = [];
 
     constructor(
-        private path: string,
-        private production: boolean,
-        private proxy: ReverseProxy
+        private readonly path: string,
+        private readonly production: boolean,
+        private readonly proxy: ReverseProxy
     ) {}
 
     async load() {

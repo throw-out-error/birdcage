@@ -9,8 +9,10 @@ import {
 } from "routing-controllers";
 import { log, ReqBody } from "../libs/utils";
 import { Auth } from "../auth";
+import { Service } from "typedi";
 
 @Controller("/auth")
+@Service()
 export class AuthController {
     constructor(private auth: Auth) {}
 

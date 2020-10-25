@@ -13,7 +13,9 @@ import { log, ReqBody } from "../libs/utils";
 import { Auth } from "../auth";
 import { Express } from "express";
 import { Route } from "src/shared/api";
+import { Service } from "typedi";
 
+@Service()
 @Controller("/routes")
 export class ProxyController {
     constructor(private storage: RouteStorage, private auth: Auth) {}

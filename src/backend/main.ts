@@ -73,9 +73,9 @@ export async function main(): Promise<void> {
     registerAPI(apiRouter, routeStorage, auth);
     app.use("/api", apiRouter); */
 
+    Container.set(Auth, auth);
+    Container.set(RouteStorage, routeStorage);
     useContainer(Container);
-    Container.bind(Auth, auth);
-    Container.bind(RouteStorage, routeStorage);
 
     const server = useExpressServer(app, {
         controllers: [AuthController, ProxyController],
