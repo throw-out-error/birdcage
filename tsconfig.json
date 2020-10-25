@@ -23,8 +23,7 @@
             "shared/*": ["/src/shared/*"],
             "frontend/*": ["/src/frontend/*"],
             "backend/*": ["/src/backend/*"]
-        },
-        "types": ["src/frontend/types.d.ts"]
+        }
     },
     "exclude": ["node_modules"]
 }
