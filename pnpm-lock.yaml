@@ -20,6 +20,7 @@ dependencies:
   unistore: 3.5.2_preact@10.5.5
 devDependencies:
   '@babel/core': 7.12.3
+  '@babel/plugin-proposal-nullish-coalescing-operator': 7.12.1_@babel+core@7.12.3
   '@babel/plugin-proposal-optional-chaining': 7.12.1_@babel+core@7.12.3
   '@babel/plugin-transform-typescript': 7.12.1_@babel+core@7.12.3
   '@babel/preset-env': 7.12.1_@babel+core@7.12.3
@@ -8464,6 +8465,7 @@ packages:
       integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 specifiers:
   '@babel/core': 7.12.3
+  '@babel/plugin-proposal-nullish-coalescing-operator': ^7.12.1
   '@babel/plugin-proposal-optional-chaining': 7.12.1
   '@babel/plugin-transform-typescript': ^7.12.1
   '@babel/preset-env': ^7.12.1
