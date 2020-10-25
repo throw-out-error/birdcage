@@ -2,14 +2,14 @@
     "name": "birdcage",
     "version": "0.0.1",
     "description": "",
-    "main": "birdcage.js",
+    "main": "dist/backend/main.js",
     "license": "MIT",
     "files": [
         "dist/",
         "src/"
     ],
     "bin": {
-        "birdcage": "birdcage.js"
+        "birdcage": "dist/backend/birdcage.js"
     },
     "scripts": {
         "dev": "npm run dev-backend && npm run dev-frontend",
@@ -17,7 +17,7 @@
         "build-clean": "npm run clear && npm run build",
         "start": "node birdcage.js",
         "build-backend": "cross-env NODE_ENV=production tsc --project tsconfig.backend.json",
-        "dev-backend": "ts-node-dev src/backend/index.ts",
+        "dev-backend": "ts-node-dev src/backend/main.ts",
         "build-frontend": "cross-env NODE_ENV=production parcel build src/frontend/*.html --public-url . --out-dir ./dist/www/",
         "dev-frontend": "parcel watch src/frontend/*.html --public-url . --out-dir ./dist/www/",
         "clear": "rimraf .cache & rimraf dist"
@@ -72,6 +72,7 @@
         "express": "^4.17.1",
         "express-session": "^1.17.1",
         "handy-redis": "^2.0.1",
+        "http-proxy": "^1.18.1",
         "mime": "^2.4.6",
         "node-forge": "^0.10.0",
         "plumbing-toolkit": "^1.2.0",
