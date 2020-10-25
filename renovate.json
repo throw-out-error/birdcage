@@ -1,5 +1,6 @@
 {
     "extends": ["config:base"],
     "includePaths": ["package.json"],
-    "schedule": ["every weekend"]
+    "schedule": ["every weekend"],
+    "includeForks": true
 }
