@@ -1,0 +1,5 @@
+{
+    "extends": ["config:base"],
+    "includePaths": ["package.json"],
+    "schedule": ["every weekend"]
+}
