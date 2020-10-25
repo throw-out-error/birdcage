@@ -9,7 +9,7 @@
         "src/"
     ],
     "bin": {
-        "birdcage": "dist/backend/birdcage.js"
+        "birdcage": "dist/backend/main.js"
     },
     "scripts": {
         "dev": "npm run dev-backend && npm run dev-frontend",
