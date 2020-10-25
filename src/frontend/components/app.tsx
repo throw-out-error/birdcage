@@ -68,8 +68,8 @@ export class App extends Component<AppProps, AppState> {
     async onLogout() {
         const { data } = await api.delete("/auth");
         if (data.success) {
-            route("/login");
             store.setState({ authed: false });
+            route("/");
         } else alert(data.error);
     }
 

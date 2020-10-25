@@ -67,9 +67,9 @@ export class BirdServer implements ReverseProxy<BirdServer> {
         this.app.use((req, res, next) => {
             const route = this.routes[req.get("host") ?? "example.com"];
             if (route && route.auth) {
-                if (this.config.auth(route, req, res, next)) next();
-                else res.status(403).send("<h1>Access Denied</h1>");
-            } else next();
+                if (this.config.auth(route, req, res, next)) return next();
+                else return res.status(403).send("<h1>Access Denied</h1>");
+            } else return next();
         });
 
         this.app.use((req, res) => {
@@ -82,14 +82,14 @@ export class BirdServer implements ReverseProxy<BirdServer> {
                 const exists = fs.existsSync(path);
                 if (exists) {
                     res.setHeader("Content-Type", mime.getType(path)!);
-                    res.sendFile(path);
+                    return res.sendFile(path);
                 } else {
                     return this.config.notFound(req, res);
                 }
             } else {
                 if (!route.target.proxyUri)
                     return this.config.notFound(req, res);
-                proxy.web(req, res, {
+                return proxy.web(req, res, {
                     target: route.target.proxyUri,
                 });
             }
