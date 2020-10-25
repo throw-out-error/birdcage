@@ -9,7 +9,6 @@ dependencies:
   express: 4.17.1
   express-session: 1.17.1
   handy-redis: 2.0.1
-  history: 5.0.0
   mime: 2.4.6
   node-forge: 0.10.0
   plumbing-toolkit: 1.2.0
@@ -35,7 +34,7 @@ devDependencies:
   eslint: 7.12.0
   eslint-config-prettier: 6.14.0_eslint@7.12.0
   eslint-plugin-prettier: 3.1.4_eslint@7.12.0+prettier@2.1.2
-  listr2: 3.1.1
+  listr2: 3.2.1
   node-sass: 4.14.1
   parcel-bundler: 1.12.4
   prettier: 2.1.2
@@ -990,6 +989,7 @@ packages:
   /@babel/runtime/7.12.1:
     dependencies:
       regenerator-runtime: 0.13.7
+    dev: true
     resolution:
       integrity: sha512-J5AIf3vPj3UwXaAzb5j1xM4WAQDX3EMgemF8rjCP3SoW09LfRKAXQKt6CoVYl230P6iWdRcBbnLDDdnqWxZSCA==
   /@babel/template/7.10.4:
@@ -1149,7 +1149,7 @@ packages:
   /@types/body-parser/1.19.0:
     dependencies:
       '@types/connect': 3.4.33
-      '@types/node': 14.14.0
+      '@types/node': 14.14.2
     dev: true
     resolution:
       integrity: sha512-W98JrE0j2K78swW4ukqMleo8R7h/pFETjM2DQ90MF6XK2i4LO4W3gQ71Lt4w3bfm2EvVSyWHplECvB5sK22yFQ==
@@ -1164,13 +1164,13 @@ packages:
       integrity: sha512-snjiYYc1TUk4iJvwO41omcrZKBB0mdwMvl718m7zZj5Tz7qBqjTNS23KQdHF2QmJX/x40m1IH16R6GNLh2Et4Q==
   /@types/connect/3.4.33:
     dependencies:
-      '@types/node': 14.14.0
+      '@types/node': 14.14.2
     dev: true
     resolution:
       integrity: sha512-2+FrkXY4zllzTNfJth7jOqEHC+enpLeGslEhpnTAkg21GkRrWV4SsAtqchtT4YS9/nODBU2/ZfsBY2X4J/dX7A==
   /@types/express-serve-static-core/4.17.13:
     dependencies:
-      '@types/node': 14.14.0
+      '@types/node': 14.14.2
       '@types/qs': 6.9.5
       '@types/range-parser': 1.2.3
     dev: true
@@ -1179,7 +1179,7 @@ packages:
   /@types/express-session/1.17.0:
     dependencies:
       '@types/express': 4.17.8
-      '@types/node': 14.14.0
+      '@types/node': 14.14.2
     dev: true
     resolution:
       integrity: sha512-OQEHeBFE1UhChVIBhRh9qElHUvTp4BzKKHxMDkGHT7WuYk5eL93hPG7D8YAIkoBSbhNEY0RjreF15zn+U0eLjA==
@@ -1243,7 +1243,7 @@ packages:
   /@types/serve-static/1.13.6:
     dependencies:
       '@types/mime': 2.0.3
-      '@types/node': 14.14.0
+      '@types/node': 14.14.2
     dev: true
     resolution:
       integrity: sha512-nuRJmv7jW7VmCVTn+IgYDkkbbDGyIINOeu/G0d74X3lm6E5KfMeQPJhxIt1ayQeQB3cSxvYs1RA/wipYoFB4EA==
@@ -4065,12 +4065,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
-  /history/5.0.0:
-    dependencies:
-      '@babel/runtime': 7.12.1
-    dev: false
-    resolution:
-      integrity: sha512-3NyRMKIiFSJmIPdq7FxkNMJkQ7ZEtVblOQ38VtKaA0zZMW1Eo6Q6W8oDKEflr1kNNTItSnk4JMCO1deeSgbLLg==
   /hmac-drbg/1.0.1:
     dependencies:
       hash.js: 1.1.7
@@ -4923,7 +4917,7 @@ packages:
       node: '>= 0.8.0'
     resolution:
       integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==
-  /listr2/3.1.1:
+  /listr2/3.2.1:
     dependencies:
       chalk: 4.1.0
       cli-truncate: 2.1.0
@@ -4939,7 +4933,7 @@ packages:
     peerDependencies:
       enquirer: '>= 2.3.0 < 3'
     resolution:
-      integrity: sha512-5HjYFP0FpG2dOuSAth2vQ172rWqI78746itLIvgg0KjHMAyW8CVNc9wzBzEo4/5UYfNbmT28u0J29NoA3W0z+Q==
+      integrity: sha512-MFhP21BpsiRYZzVu3N9YV4oz/8/+lzMC+RhSRwdDkDCF9Z/1uNquHFji9NZ7HpiCzpccQ/mHYrS+dbyn3T8dcQ==
   /load-json-file/1.1.0:
     dependencies:
       graceful-fs: 4.2.4
@@ -6852,6 +6846,7 @@ packages:
     resolution:
       integrity: sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
   /regenerator-runtime/0.13.7:
+    dev: true
     resolution:
       integrity: sha512-a54FxoJDIr27pgf7IgeQGxmqUNYrcV338lf/6gH456HZ/PhX+5BcwHXG9ajESmwe6WRO0tAzRUrRmNONWgkrew==
   /regenerator-transform/0.14.5:
@@ -8624,48 +8619,47 @@ packages:
     resolution:
       integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 specifiers:
-  '@babel/core': ^7.12.3
-  '@babel/plugin-proposal-optional-chaining': ^7.12.1
+  '@babel/core': 7.12.3
+  '@babel/plugin-proposal-optional-chaining': 7.12.1
   '@toes/core': dev
-  '@types/bcrypt': ^3.0.0
+  '@types/bcrypt': 3.0.0
   '@types/connect-redis': 0.0.14
-  '@types/express': ^4.17.8
-  '@types/express-session': ^1.17.0
-  '@types/http-proxy': ^1.17.4
-  '@types/node': ^14.14.2
-  '@typescript-eslint/eslint-plugin': ^4.5.0
-  '@typescript-eslint/parser': ^4.5.0
+  '@types/express': 4.17.8
+  '@types/express-session': 1.17.0
+  '@types/http-proxy': 1.17.4
+  '@types/node': 14.14.2
+  '@typescript-eslint/eslint-plugin': 4.5.0
+  '@typescript-eslint/parser': 4.5.0
   axios: ^0.21.0
   bcrypt: ^5.0.0
   chalk: ^4.1.0
   class-transformer: ^0.3.1
   class-validator: ^0.12.2
   connect-redis: ^5.0.0
-  cross-env: ^7.0.2
-  cssnano: ^4.1.10
-  eslint: ^7.12.0
-  eslint-config-prettier: ^6.14.0
-  eslint-plugin-prettier: ^3.1.4
+  cross-env: 7.0.2
+  cssnano: 4.1.10
+  eslint: 7.12.0
+  eslint-config-prettier: 6.14.0
+  eslint-plugin-prettier: 3.1.4
   express: ^4.17.1
   express-session: ^1.17.1
   handy-redis: ^2.0.1
-  history: ^5.0.0
-  listr2: ^3.1.1
+  listr2: 3.2.1
   mime: ^2.4.6
   node-forge: ^0.10.0
-  node-sass: ^4.14.1
-  parcel-bundler: ^1.12.4
+  node-sass: 4.14.1
+  parcel-bundler: 1.12.4
   plumbing-toolkit: ^1.2.0
   preact: ^10.5.5
   preact-router: ^3.2.1
-  prettier: ^2.1.2
+  prettier: 2.1.2
   pretty-json-stringify: 0.0.2
   redbird: ^0.10.0
-  rimraf: ^3.0.2
+  rimraf: 3.0.2
   routing-controllers: ^0.9.0-alpha.6
-  ts-loader: ^8.0.7
-  ts-node: ^9.0.0
-  ts-node-dev: ^1.0.0
+  ts-loader: 8.0.7
+  ts-node: 9.0.0
+  ts-node-dev: 1.0.0
   typedi: ^0.8.0
-  typescript: ^4.0.3
-  ultra-runner: ^3.5.0
+  typescript: 4.0.3
+  ultra-runner: 3.5.0
