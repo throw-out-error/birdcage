@@ -21,6 +21,8 @@ dependencies:
 devDependencies:
   '@babel/core': 7.12.3
   '@babel/plugin-proposal-optional-chaining': 7.12.1_@babel+core@7.12.3
+  '@babel/plugin-transform-typescript': 7.12.1_@babel+core@7.12.3
+  '@babel/preset-env': 7.12.1_@babel+core@7.12.3
   '@babel/preset-react': 7.12.1_@babel+core@7.12.3
   '@types/bcrypt': 3.0.0
   '@types/connect-redis': 0.0.14
@@ -564,6 +566,15 @@ packages:
       '@babel/core': ^7.0.0-0
     resolution:
       integrity: sha512-i7ooMZFS+a/Om0crxZodrTzNEPJHZrlMVGMTEpFAj6rYY/bKCddB0Dk/YxfPuYXOopuhKk/e1jV6h+WUU9XN3A==
+  /@babel/plugin-syntax-typescript/7.12.1_@babel+core@7.12.3:
+    dependencies:
+      '@babel/core': 7.12.3
+      '@babel/helper-plugin-utils': 7.10.4
+    dev: true
+    peerDependencies:
+      '@babel/core': ^7.0.0-0
+    resolution:
+      integrity: sha512-UZNEcCY+4Dp9yYRCAHrHDU+9ZXLYaY9MgBXSRLkB9WjYFRR6quJBumfVrEkUxrePPBwFcpWfNKXqVRQQtm7mMA==
   /@babel/plugin-transform-arrow-functions/7.12.1_@babel+core@7.12.3:
     dependencies:
       '@babel/core': 7.12.3
@@ -929,6 +940,17 @@ packages:
       '@babel/core': ^7.0.0-0
     resolution:
       integrity: sha512-EPGgpGy+O5Kg5pJFNDKuxt9RdmTgj5sgrus2XVeMp/ZIbOESadgILUbm50SNpghOh3/6yrbsH+NB5+WJTmsA7Q==
+  /@babel/plugin-transform-typescript/7.12.1_@babel+core@7.12.3:
+    dependencies:
+      '@babel/core': 7.12.3
+      '@babel/helper-create-class-features-plugin': 7.12.1_@babel+core@7.12.3
+      '@babel/helper-plugin-utils': 7.10.4
+      '@babel/plugin-syntax-typescript': 7.12.1_@babel+core@7.12.3
+    dev: true
+    peerDependencies:
+      '@babel/core': ^7.0.0-0
+    resolution:
+      integrity: sha512-VrsBByqAIntM+EYMqSm59SiMEf7qkmI9dqMt6RbD/wlwueWmYcI0FFK5Fj47pP6DRZm+3teXjosKlwcZJ5lIMw==
   /@babel/plugin-transform-unicode-escapes/7.12.1_@babel+core@7.12.3:
     dependencies:
       '@babel/core': 7.12.3
@@ -1979,8 +2001,8 @@ packages:
       integrity: sha512-Z942RysHXmJrhqk88FmKBVq/v5tqmSkDz7p54G/MGyjMnCFFnC79XWNbg+Vta8W6Wb2qtSZTSxIGkJrRpCFEiA==
   /browserslist/4.14.5:
     dependencies:
-      caniuse-lite: 1.0.30001148
-      electron-to-chromium: 1.3.582
+      caniuse-lite: 1.0.30001151
+      electron-to-chromium: 1.3.583
       escalade: 3.1.1
       node-releases: 1.1.64
     dev: true
@@ -2122,6 +2144,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-E66qcd0KMKZHNJQt9hiLZGE3J4zuTqE1OnU53miEVtylFbwOEmeA5OsRu90noZful+XGSQOni1aT2tiqu/9yYw==
+  /caniuse-lite/1.0.30001151:
+    dev: true
+    resolution:
+      integrity: sha512-Zh3sHqskX6mHNrqUerh+fkf0N72cMxrmflzje/JyVImfpknscMnkeJrlFGJcqTmaa0iszdYptGpWMJCRQDkBVw==
   /caseless/0.12.0:
     dev: true
     resolution:
@@ -3061,10 +3087,10 @@ packages:
   /ee-first/1.1.1:
     resolution:
       integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
-  /electron-to-chromium/1.3.582:
+  /electron-to-chromium/1.3.583:
     dev: true
     resolution:
-      integrity: sha512-0nCJ7cSqnkMC+kUuPs0YgklFHraWGl/xHqtZWWtOeVtyi+YqkoAOMGuZQad43DscXCQI/yizcTa3u6B5r+BLww==
+      integrity: sha512-L9BwLwJohjZW9mQESI79HRzhicPk1DFgM+8hOCfGgGCFEcA3Otpv7QK6SGtYoZvfQfE3wKLh0Hd5ptqUFv3gvQ==
   /elliptic/6.5.3:
     dependencies:
       bn.js: 4.11.9
@@ -8439,6 +8465,8 @@ packages:
 specifiers:
   '@babel/core': 7.12.3
   '@babel/plugin-proposal-optional-chaining': 7.12.1
+  '@babel/plugin-transform-typescript': ^7.12.1
+  '@babel/preset-env': ^7.12.1
   '@babel/preset-react': ^7.12.1
   '@toes/core': dev
   '@types/bcrypt': 3.0.0
