@@ -144,6 +144,7 @@ body {
             font-size: 22px;
             padding-left: 10px;
             min-height: 50px;
+            display: flex;
 
             .logo {
                 padding: 10px 25px;
@@ -172,6 +173,7 @@ body {
         .body {
             position: relative;
             background-color: rgba(24, 25, 26, 0.92);
+            padding: 25px;
 
             .hidden {
                 display: none;
@@ -244,9 +246,11 @@ body {
                         display: grid;
                         background-color: rgba(255, 255, 255, 0.1);
                         margin-bottom: calc(var(--row-height) / 5);
-                        grid-template: var(--row-height) var(--row-height) var(
+                        grid-template:
+                            var(--row-height) var(--row-height) var(
                                 --row-height
-                            ) / 1fr 1fr var(--row-height);
+                            )
+                            / 1fr 1fr var(--row-height);
                         height: var(--row-height);
                         transition: height 0.2s;
                         width: 100%;
@@ -258,9 +262,11 @@ body {
                         }
 
                         &.add {
-                            grid-template: var(--row-height) var(--row-height) var(
+                            grid-template:
+                                var(--row-height) var(--row-height) var(
                                     --row-height
-                                ) / 1fr 1fr;
+                                )
+                                / 1fr 1fr;
                         }
 
                         .only-expanded {

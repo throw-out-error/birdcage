@@ -1,27 +1,26 @@
-import { h, Component } from "preact";
-import { Routes } from "./routes";
-//import Router from "preact-router";
-import { Login } from "./login";
-import { SetPassword } from "./setpassword";
+import { h, Component, RefObject } from "preact";
+import { LoginPage, RouteManagementPage, HomePage } from "./pages";
 import { api } from "../api";
-import { Settings } from "./settings";
+import Router, { Route, route } from "preact-router";
+import background from "../img/background.jpg";
+import { Header } from "./header";
 
 interface AppState {
     backgroundImage: string;
     authed: boolean;
     settings: boolean;
     color: string;
+    pages: Record<string, RefObject<{ onAuth?: () => void }>>;
     bgtag: string;
 }
 
 export type AppProps = Record<string, unknown>;
 
 export class App extends Component<AppProps, AppState> {
-    routes: Routes = undefined as any;
-
     constructor(props: AppProps) {
         super(props);
         this.state = {
+            pages: {},
             backgroundImage: "",
             authed: false,
             settings: false,
@@ -30,36 +29,37 @@ export class App extends Component<AppProps, AppState> {
         };
     }
 
-    loadBackground(bgtag: string) {
+    loadBackground(bgtag: string): void {
         const bg = new Image();
-        bg.src = "https://source.unsplash.com/daily?" + bgtag;
+        bg.src = background;
         bg.onload = () => {
             this.setState({ backgroundImage: bg.src });
         };
     }
 
-    async componentDidMount() {
+    async componentDidMount(): Promise<void> {
         this.loadBackground(this.state.bgtag);
         const app = document.getElementById("app-container");
         if (app) app.style.setProperty("--bg-color", this.state.color);
     }
 
-    onAuth() {
-        this.routes.loadRoutes();
+    onAuth(): void {
         this.setState({ authed: true });
+        route("/");
+        Object.values(this.state.pages ?? {}).forEach((r) => {
+            const p = r.current;
+            if (p && p.onAuth) p.onAuth();
+        });
     }
 
-    toggleSettings() {
+    toggleSettings(): void {
         this.setState({ settings: !this.state.settings });
     }
 
     async onLogout() {
         const { data } = await api.delete("/auth");
-        if (data.success) {
-            location.reload(true);
-        } else {
-            alert(data.error);
-        }
+        if (data.success) route("/login");
+        else alert(data.error);
     }
 
     onChangeColor(newColor: string) {
@@ -87,47 +87,25 @@ export class App extends Component<AppProps, AppState> {
                     }}
                 />
                 <div className="app">
-                    <div className="header">
-                        <span className="logo" />
-                        Birdcage
-                        {!state.authed ? (
-                            ""
-                        ) : (
-                            <div className="right">
-                                <button
-                                    type="button"
-                                    onClick={this.toggleSettings.bind(this)}
-                                    className="btn settings"
-                                >
-                                    <i className="fa fa-gear"></i>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={this.onLogout.bind(this)}
-                                    className="btn logout"
-                                >
-                                    <i className="fa fa-sign-out"></i>
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    <Header
+                        authed={this.state.authed}
+                        onLogout={this.onLogout.bind(this)}
+                    />
                     <div className="body">
-                        <Routes
-                            path="/routes"
-                            ref={(el) => (this.routes = el)}
-                        />
-                        <div className={state.settings ? "overlay" : "hidden"}>
-                            <Settings
-                                onClose={this.toggleSettings.bind(this)}
-                                color={this.state.color}
-                                onChangeColor={this.onChangeColor.bind(this)}
-                                bgtag={this.state.bgtag}
-                                onChangeBg={this.onChangeBg.bind(this)}
+                        <Router>
+                            <Route
+                                path="/login"
+                                component={LoginPage}
+                                authed={this.state.authed}
+                                onAuth={this.onAuth}
                             />
-                        </div>
-                        <div className={state.authed ? "hidden" : "overlay"}>
-                            <Login onAuth={this.onAuth.bind(this)} />
-                        </div>
+                            <RouteManagementPage
+                                path="/routes"
+                                authed={this.state.authed}
+                                ref={this.state.pages.routeManagement}
+                            />
+                            <Route path="/" default component={HomePage} />
+                        </Router>
                     </div>
                 </div>
             </div>

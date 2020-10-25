@@ -1,7 +1,9 @@
 import { loadConfig, Config, updateConfig } from "./libs/config";
-import { ReverseProxy } from "./libs/redbird";
-import { Route } from "src/shared/admin-api";
+import { ReverseProxy } from "./server";
+import { Route, TargetOptions } from "src/shared/api";
+import { Service } from "typedi";
 
+@Service()
 export class RouteStorage {
     routes: Route[] = [];
 
@@ -18,25 +20,12 @@ export class RouteStorage {
     }
 
     private registerRoute(route: Route) {
-        this.proxy.register(
-            route.source,
-            route.target,
-            !route.ssl
-                ? {}
-                : {
-                      ssl: {
-                          letsencrypt: {
-                              email: route.email,
-                              production: this.production,
-                          },
-                      },
-                  }
-        );
+        if (route.target.proxyUri) this.proxy.register(route);
     }
 
     private findRoute(
         source: string,
-        target: string
+        target: TargetOptions
     ): { route: Route; idx: number } | undefined {
         const idx = this.routes.findIndex(
             (r) => r.source === source && r.target === target
@@ -44,7 +33,7 @@ export class RouteStorage {
         return idx >= 0 ? { route: this.routes[idx], idx } : undefined;
     }
 
-    public getRoute(source: string, target: string): Route | undefined {
+    public getRoute(source: string, target: TargetOptions): Route | undefined {
         const result = this.findRoute(source, target);
         return result ? result.route : undefined;
     }
@@ -60,18 +49,18 @@ export class RouteStorage {
         const result = this.findRoute(route.source, route.target);
         if (result) {
             this.removeRoute(result.idx);
-            this.proxy.unregister(route.source, route.target);
+            this.proxy.unregister(route);
         }
         this.registerRoute(route);
         this.routes = [route, ...this.routes];
         return updateConfig<Config>({ routes: this.routes }, this.path);
     }
 
-    async unregister(source: string, target: string) {
+    async unregister(source: string, target: TargetOptions) {
         const result = this.findRoute(source, target);
         if (result) {
             this.removeRoute(result.idx);
-            this.proxy.unregister(source, target);
+            this.proxy.unregister(result.route);
             return updateConfig<Config>({ routes: this.routes }, this.path);
         }
         throw new Error("Route doesn't exist!");

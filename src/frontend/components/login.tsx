@@ -1,15 +1,13 @@
 import { h, Component } from "preact";
 import { api } from "../api";
 import { Input } from "./input";
+import { OnAuthProps } from "./utils";
 
-export interface LoginProps {
-    onAuth(): void;
-}
 interface LoginState {
     password: string;
 }
-export class Login extends Component<LoginProps, LoginState> {
-    constructor(props: LoginProps) {
+export class Login extends Component<OnAuthProps, LoginState> {
+    constructor(props: OnAuthProps) {
         super(props);
         this.state = {
             password: "",
@@ -32,7 +30,7 @@ export class Login extends Component<LoginProps, LoginState> {
         }
     }
 
-    render(props: LoginProps, state: LoginState) {
+    render(props: OnAuthProps, state: LoginState) {
         return (
             <div className="login">
                 <div className="password">

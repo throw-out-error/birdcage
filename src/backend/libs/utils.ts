@@ -1,8 +1,9 @@
 import chalk from "chalk";
 import { ConsoleLogger, PrefixLogger } from "@toes/core";
-import { readFile as rF, writeFile as wF } from "fs";
 
 export { chalk };
+
+export type ReqBody = Record<string, never>;
 
 /**
  * Does nothing.

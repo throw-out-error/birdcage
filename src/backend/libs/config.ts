@@ -1,4 +1,4 @@
-import { Route } from "src/shared/admin-api";
+import { Route } from "src/shared/api";
 import { loadConfig as lc, writeFile, exists } from "@toes/core";
 import { join } from "path";
 

@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
 import { api } from "../api";
-import { Route } from "../../shared/admin-api";
+import { Route } from "../../shared/api";
 import { Checkbox } from "./checkbox";
 import { Input } from "./input";
 
@@ -16,7 +16,7 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
         this.state = {
             route: {
                 source: "",
-                target: "",
+                target: {},
                 ssl: false,
                 email: "",
             },
@@ -50,8 +50,13 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
                 </div>
                 <div className="target">
                     <Input
-                        placeholder="Target"
-                        onChanged={(val) => this.setRoute("target", val)}
+                        placeholder="Proxied URI"
+                        onChanged={(val) =>
+                            this.setRoute("target", {
+                                ...this.state.route.target,
+                                proxyUri: val,
+                            })
+                        }
                         onSubmit={this.onAdd.bind(this)}
                     />
                 </div>

@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
 import { api } from "../api";
-import { Route } from "../../shared/admin-api";
+import { Route } from "../../shared/api";
 import { RouteEntry } from "./route";
 import { AddRoute } from "./addroute";
 

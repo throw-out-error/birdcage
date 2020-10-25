@@ -1,8 +1,10 @@
 import { loadConfig, Config, updateConfig } from "./libs/config";
 import { hash, compare } from "bcrypt";
+import { Service } from "typedi";
 
+@Service()
 export class Auth {
-    private password = ".";
+    private password = "";
 
     constructor(private path: string) {}
 
@@ -11,6 +13,8 @@ export class Auth {
         this.password = config.admin_password;
     }
 
+    checkAuth = (session: Express.Session) => !!(session && session.authed);
+
     async setPassword(pw: string): Promise<boolean> {
         this.password = await hash(pw, 10);
         await updateConfig<Config>({ admin_password: this.password });
@@ -18,8 +22,7 @@ export class Auth {
     }
 
     async checkPassword(pw: string): Promise<boolean> {
-        return this.password && this.password.trim() !== ""
-            ? await compare(pw, this.password)
-            : true;
+        if (!this.password || this.password === "") return true;
+        return await compare(pw, this.password);
     }
 }

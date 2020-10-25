@@ -1,8 +1,17 @@
+export interface TargetOptions {
+    webroot?: string;
+    proxyUri?: string;
+}
+
 export interface Route {
     source: string;
-    target: string;
+    target: TargetOptions;
     ssl: boolean;
     email: string;
+    /**
+     * If specified, these are the valid users/roles that are allowed to access this route;
+     */
+    auth?: string[] | string;
 }
 
 export interface Response {
