@@ -6,6 +6,7 @@ import {
     IsBoolean,
     IsDefined,
     IsEmail,
+    IsNotEmptyObject,
 } from "class-validator";
 
 export class TargetOptions {
@@ -40,11 +41,13 @@ export class Route implements IRoute {
     @IsDefined()
     source = "example.com";
     @IsDefined()
+    @IsNotEmptyObject()
     target: TargetOptions = {};
     @IsDefined()
     @IsBoolean()
     ssl = false;
 
+    @ValidateIf((o: IRoute) => o.email !== undefined && o.email !== null)
     @IsEmail()
     email = "admin@example.com";
 

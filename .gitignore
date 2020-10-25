@@ -3,3 +3,4 @@ node_modules
 dist
 config/*.json
 !config/sample.json
+package-lock.json

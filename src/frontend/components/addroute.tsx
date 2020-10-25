@@ -24,10 +24,11 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
     }
 
     async onAdd() {
+        if (!this.state.route.email)
+            this.state.route.email = "admin@example.com";
         const { data } = await api.post("/routes", this.state.route);
         if (data.success) {
             this.props.onRouteAdded(this.state.route);
-            console.log(this.state);
         } else {
             alert(data.error);
         }

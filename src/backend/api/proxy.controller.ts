@@ -9,11 +9,12 @@ import {
     Session,
 } from "routing-controllers";
 import { RouteStorage } from "../storage";
-import { log, ReqBody } from "../libs/utils";
+import { log } from "../libs/utils";
 import { Auth } from "../auth";
 import { Express } from "express";
-import { Route } from "src/shared/api";
+import { Route } from "../../shared/api";
 import { Service } from "typedi";
+import { validate } from "class-validator";
 
 @Service()
 @Controller("/routes")
@@ -29,11 +30,15 @@ export class ProxyController {
 
     @Post()
     async addRoute(
-        @Body({ validate: true }) body: Route,
+        @Body({ validate: false }) body: Route,
         @Session() session: Express.Session
     ) {
         try {
             const { source, target } = body;
+
+            const validation = await validate(body);
+            if (validation && validation.length > 0)
+                throw new Error(`Validation errors: ${validation.join(", ")}`);
 
             if (!this.auth.checkAuth(session))
                 throw new Error("Not logged in!");
