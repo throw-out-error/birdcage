@@ -76,15 +76,17 @@ export async function main(): Promise<void> {
     useContainer(Container);
     Container.bind(Auth, auth);
     Container.bind(RouteStorage, routeStorage);
-    app.use(serveStatic(path("..", "..", "dist", "www")));
-    /* final catch-all route to index.html defined last */
-    app.get("/*", (_, res) => {
-        res.sendFile(path("..", "..", "dist", "www", "index.html"));
-    });
 
     const server = useExpressServer(app, {
         controllers: [AuthController, ProxyController],
         routePrefix: "/api",
+    });
+
+    server.use(serveStatic(path("..", "..", "dist", "www")));
+
+    /* final catch-all route to index.html defined last */
+    server.get("/*", (_, res) => {
+        res.sendFile(path("..", "..", "dist", "www", "index.html"));
     });
 
     server.listen(config.ports.admin, () => {

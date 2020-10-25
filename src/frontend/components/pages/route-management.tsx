@@ -1,12 +1,9 @@
 import { h, Component, RenderableProps, RefObject } from "preact";
 import { Routes } from "../routes";
 import { Denied } from "../denied";
+import { store } from "../utils";
 
-export interface RouteManagementProps extends RenderableProps<unknown> {
-    authed: boolean;
-}
-
-export class RouteManagementPage extends Component<RouteManagementProps> {
+export class RouteManagementPage extends Component {
     routes?: RefObject<Routes>;
 
     onAuth(): void {
@@ -14,7 +11,7 @@ export class RouteManagementPage extends Component<RouteManagementProps> {
     }
 
     render() {
-        if (!this.props.authed) return <Denied />;
+        if (!store.getState().authed) return <Denied />;
         return (
             <div>
                 <Routes path="/routes" ref={this.routes} />

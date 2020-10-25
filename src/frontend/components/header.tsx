@@ -1,51 +1,33 @@
 import { h, Component } from "preact";
 import { Link } from "preact-router";
+import { store } from "./utils";
 
-export interface HeaderProps extends HeaderState {
+export interface HeaderProps {
     onLogout: () => void;
 }
 
-export interface HeaderState {
-    authed: boolean;
-}
-
-export class Header extends Component<HeaderProps, HeaderState> {
+export class Header extends Component<HeaderProps, { authed: boolean }> {
     constructor(props: HeaderProps) {
         super(props);
-        this.state = props;
+        this.state = { authed: false };
     }
 
-    getDerivedStateFromProps(
-        props: HeaderProps,
-        currentState: HeaderState
-    ): HeaderState {
-        if (currentState.authed !== props.authed)
-            return {
-                ...currentState,
-                authed: props.authed,
-            };
+    componentDidMount() {
+        store.subscribe((state) => {
+            console.log(`New state: ${JSON.stringify(state)}`);
 
-        return currentState;
+            this.setState({ authed: state.authed });
+            this.forceUpdate();
+        });
     }
 
     render() {
         return (
             <div className="header">
                 <span className="logo" />
-                Birdcage
-                {!this.state.authed ? (
-                    ""
-                ) : (
-                    <div className="right">
-                        <button
-                            type="button"
-                            onClick={this.props.onLogout.bind(this)}
-                            className="btn logout"
-                        >
-                            <i className="fa fa-sign-out"></i>
-                        </button>
-                    </div>
-                )}
+                <span className="logo-text">
+                    <Link href="/">Birdcage</Link>
+                </span>
                 <nav className="header-navbar">
                     {!this.state.authed ? (
                         <ul
@@ -67,6 +49,19 @@ export class Header extends Component<HeaderProps, HeaderState> {
                         </ul>
                     )}
                 </nav>
+                {!this.state.authed ? (
+                    ""
+                ) : (
+                    <div className="right">
+                        <button
+                            type="button"
+                            onClick={this.props.onLogout.bind(this)}
+                            className="btn logout"
+                        >
+                            <i className="fa fa-sign-out"></i>
+                        </button>
+                    </div>
+                )}
             </div>
         );
     }

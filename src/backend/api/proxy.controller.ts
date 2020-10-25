@@ -21,7 +21,7 @@ export class ProxyController {
     @Get()
     async getRoutes(@Session() session: Express.Session) {
         if (!this.auth.checkAuth(session)) return [];
-
+        // console.log(this.storage.routes);
         return this.storage.routes;
     }
 

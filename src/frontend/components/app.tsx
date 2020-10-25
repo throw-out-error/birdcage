@@ -4,13 +4,21 @@ import { api } from "../api";
 import Router, { Route, route } from "preact-router";
 import background from "../img/background.jpg";
 import { Header } from "./header";
+import { store } from "./utils";
+import { Provider } from "unistore/preact";
 
 interface AppState {
     backgroundImage: string;
-    authed: boolean;
     settings: boolean;
     color: string;
-    pages: Record<string, RefObject<{ onAuth?: () => void }>>;
+    pages: Record<
+        string,
+        RefObject<{
+            onAuth?: () => void;
+            update: (newState: unknown) => unknown;
+            forceUpdate?: () => void;
+        }>
+    >;
     bgtag: string;
 }
 
@@ -22,7 +30,6 @@ export class App extends Component<AppProps, AppState> {
         this.state = {
             pages: {},
             backgroundImage: "",
-            authed: false,
             settings: false,
             color: localStorage.getItem("color") || "#7D7DDD",
             bgtag: localStorage.getItem("bgtag") || "colorful",
@@ -44,11 +51,13 @@ export class App extends Component<AppProps, AppState> {
     }
 
     onAuth(): void {
-        this.setState({ authed: true });
+        store.setState({ authed: true });
         route("/");
         Object.values(this.state.pages ?? {}).forEach((r) => {
             const p = r.current;
-            if (p && p.onAuth) p.onAuth();
+            if (p) {
+                if (p.onAuth) p.onAuth();
+            }
         });
     }
 
@@ -58,8 +67,10 @@ export class App extends Component<AppProps, AppState> {
 
     async onLogout() {
         const { data } = await api.delete("/auth");
-        if (data.success) route("/login");
-        else alert(data.error);
+        if (data.success) {
+            route("/login");
+            store.setState({ authed: false });
+        } else alert(data.error);
     }
 
     onChangeColor(newColor: string) {
@@ -77,38 +88,34 @@ export class App extends Component<AppProps, AppState> {
 
     render(props: AppProps, state: AppState) {
         return (
-            <div id="app-container">
-                <div
-                    className={`app-background ${
-                        this.state.backgroundImage === "" ? "" : "visible"
-                    }`}
-                    style={{
-                        backgroundImage: `url(${this.state.backgroundImage})`,
-                    }}
-                />
-                <div className="app">
-                    <Header
-                        authed={this.state.authed}
-                        onLogout={this.onLogout.bind(this)}
+            <Provider store={store}>
+                <div id="app-container">
+                    <div
+                        className={`app-background ${
+                            this.state.backgroundImage === "" ? "" : "visible"
+                        }`}
+                        style={{
+                            backgroundImage: `url(${this.state.backgroundImage})`,
+                        }}
                     />
-                    <div className="body">
-                        <Router>
-                            <Route
-                                path="/login"
-                                component={LoginPage}
-                                authed={this.state.authed}
-                                onAuth={this.onAuth}
-                            />
-                            <RouteManagementPage
-                                path="/routes"
-                                authed={this.state.authed}
-                                ref={this.state.pages.routeManagement}
-                            />
-                            <Route path="/" default component={HomePage} />
-                        </Router>
+                    <div className="app">
+                        <Header
+                            onLogout={this.onLogout.bind(this)}
+                            ref={this.state.pages.header}
+                        />
+                        <div className="body">
+                            <Router>
+                                <LoginPage path="/login" onAuth={this.onAuth} />
+                                <RouteManagementPage
+                                    path="/routes"
+                                    ref={this.state.pages.routeManagement}
+                                />
+                                <Route path="/" default component={HomePage} />
+                            </Router>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Provider>
         );
     }
 }

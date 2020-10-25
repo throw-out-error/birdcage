@@ -61,14 +61,15 @@ export class Routes extends Component<RoutesProps, RoutesState> {
             <div className="routes">
                 <div className="routelist">
                     <AddRoute onRouteAdded={this.onAdd.bind(this)} />
-                    {this.state.routes.map((route) => (
-                        <RouteEntry
-                            route={route}
-                            onDeleted={this.onDelete.bind(this)}
-                            onUpdated={this.onUpdated.bind(this)}
-                            key={route.source + ";" + route.target}
-                        />
-                    ))}
+                    {this.state.routes &&
+                        this.state.routes.map((route) => (
+                            <RouteEntry
+                                route={route}
+                                onDeleted={this.onDelete.bind(this)}
+                                onUpdated={this.onUpdated.bind(this)}
+                                key={route.source + ";" + route.target}
+                            />
+                        ))}
                 </div>
             </div>
         );
