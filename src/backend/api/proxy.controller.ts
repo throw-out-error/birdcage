@@ -24,11 +24,14 @@ export class ProxyController {
     async getRoutes(@Session() session: Express.Session) {
         if (!this.auth.checkAuth(session)) return [];
         // console.log(this.storage.routes);
-        return this.storage.routes;
+        return this.storage.getRoutes();
     }
 
     @Post()
-    async addRoute(@Body() body: ReqBody, @Session() session: Express.Session) {
+    async addRoute(
+        @Body({ validate: true }) body: Route,
+        @Session() session: Express.Session
+    ) {
         try {
             const { source, target } = body;
 
@@ -73,18 +76,23 @@ export class ProxyController {
 
     @Delete("/:source/:target")
     async deleteRoute(
-        @Params() params: Route,
+        @Params() params: Record<string, string>,
         @Session() session: Express.Session
     ) {
         try {
-            const route: Route = params;
+            const route: Route = {
+                ...params,
+                target: JSON.parse(decodeURIComponent(params.target)),
+            } as Route;
 
             if (!this.auth.checkAuth(session))
                 throw new Error("Not logged in!");
 
             await this.storage.unregister(route.source, route.target);
             log.interaction.info(
-                `Deleted route: ${route.source} -> ${route.target}`
+                `Deleted route: ${route.source} -> ${JSON.stringify(
+                    route.target
+                )}`
             );
             return { success: true };
         } catch (err) {

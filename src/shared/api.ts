@@ -1,9 +1,29 @@
-export interface TargetOptions {
+import {
+    ValidateIf,
+    IsFQDN,
+    Length,
+    IsUrl,
+    IsBoolean,
+    IsDefined,
+    IsEmail,
+} from "class-validator";
+
+export class TargetOptions {
+    @ValidateIf(
+        (o: TargetOptions) => o.webroot !== undefined && o.webroot !== null
+    )
+    @Length(3)
     webroot?: string;
+
+    @ValidateIf(
+        (o: TargetOptions) => o.proxyUri !== undefined && o.proxyUri !== null
+    )
+    @Length(1)
+    @IsUrl()
     proxyUri?: string;
 }
 
-export interface Route {
+export interface IRoute {
     source: string;
     target: TargetOptions;
     ssl: boolean;
@@ -12,6 +32,23 @@ export interface Route {
      * If specified, these are the valid users/roles that are allowed to access this route;
      */
     auth?: string[] | string;
+}
+
+export class Route implements IRoute {
+    @Length(1)
+    @IsFQDN()
+    @IsDefined()
+    source = "example.com";
+    @IsDefined()
+    target: TargetOptions = {};
+    @IsDefined()
+    @IsBoolean()
+    ssl = false;
+
+    @IsEmail()
+    email = "admin@example.com";
+
+    auth?: string | string[] | undefined;
 }
 
 export interface Response {

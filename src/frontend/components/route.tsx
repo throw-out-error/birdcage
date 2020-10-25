@@ -26,7 +26,10 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
         const { source, target } = this.props.route;
         const { data } = await api.delete(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
-                target
+                JSON.stringify({
+                    proxyUri: target.proxyUri,
+                    webroot: target.webroot,
+                } as Route["target"])
             )}`
         );
         if (data.success) {
@@ -40,7 +43,10 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
         const { source, target } = this.props.route;
         const { data } = await api.put(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
-                target
+                JSON.stringify({
+                    proxyUri: target.proxyUri,
+                    webroot: target.webroot,
+                } as Route["target"])
             )}`,
             this.state.route
         );

@@ -5,8 +5,7 @@ import { Service } from "typedi";
 
 @Service()
 export class RouteStorage {
-    routes: Route[] = [];
-
+    private config!: Config;
     constructor(
         private readonly path: string,
         private readonly production: boolean,
@@ -14,9 +13,12 @@ export class RouteStorage {
     ) {}
 
     async load() {
-        const config = await loadConfig(this.path);
-        this.routes = config.routes;
-        for (const route of this.routes) this.registerRoute(route);
+        this.config = await loadConfig(this.path);
+        for (const route of this.config.routes) this.registerRoute(route);
+    }
+
+    getRoutes(): Route[] {
+        return this.config.routes;
     }
 
     private registerRoute(route: Route) {
@@ -27,10 +29,10 @@ export class RouteStorage {
         source: string,
         target: TargetOptions
     ): { route: Route; idx: number } | undefined {
-        const idx = this.routes.findIndex(
+        const idx = this.config.routes.findIndex(
             (r) => r.source === source && r.target === target
         );
-        return idx >= 0 ? { route: this.routes[idx], idx } : undefined;
+        return idx >= 0 ? { route: this.config.routes[idx], idx } : undefined;
     }
 
     public getRoute(source: string, target: TargetOptions): Route | undefined {
@@ -39,7 +41,7 @@ export class RouteStorage {
     }
 
     private removeRoute(idx: number) {
-        this.routes.splice(idx, 1);
+        this.config.routes.splice(idx, 1);
     }
 
     async register(route: Route) {
@@ -52,8 +54,8 @@ export class RouteStorage {
             this.proxy.unregister(route);
         }
         this.registerRoute(route);
-        this.routes = [route, ...this.routes];
-        return updateConfig<Config>({ routes: this.routes }, this.path);
+        this.config.routes = [route, ...this.config.routes];
+        return updateConfig<Config>({ routes: this.config.routes }, this.path);
     }
 
     async unregister(source: string, target: TargetOptions) {
@@ -61,7 +63,10 @@ export class RouteStorage {
         if (result) {
             this.removeRoute(result.idx);
             this.proxy.unregister(result.route);
-            return updateConfig<Config>({ routes: this.routes }, this.path);
+            return updateConfig<Config>(
+                { routes: this.config.routes },
+                this.path
+            );
         }
         throw new Error("Route doesn't exist!");
     }
