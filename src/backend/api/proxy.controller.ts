@@ -39,7 +39,9 @@ export class ProxyController {
                 throw new Error("Route already exists!");
 
             await this.storage.register((body as unknown) as Route);
-            log.interaction.info(`Added route: ${source} -> ${target}`);
+            log.interaction.info(
+                `Added route: ${source} -> ${JSON.stringify(target)}`
+            );
             return { success: true };
         } catch (err) {
             log.main.error(`Error adding route: ${err.toString()}`);
