@@ -25,7 +25,7 @@ export class ProxyController {
     async getRoutes(@Session() session: Express.Session) {
         if (!this.auth.checkAuth(session)) return [];
         // console.log(this.storage.routes);
-        return this.storage.getRoutes();
+        return await this.storage.getRoutes();
     }
 
     @Post()
@@ -43,7 +43,7 @@ export class ProxyController {
             if (!this.auth.checkAuth(session))
                 throw new Error("Not logged in!");
 
-            if (this.storage.getRoute(source, target))
+            if (await this.storage.getRoute(source, target))
                 throw new Error("Route already exists!");
 
             await this.storage.register((body as unknown) as Route);
@@ -89,6 +89,8 @@ export class ProxyController {
                 ...params,
                 target: JSON.parse(decodeURIComponent(params.target)),
             } as Route;
+
+            log.main.info(route);
 
             if (!this.auth.checkAuth(session))
                 throw new Error("Not logged in!");

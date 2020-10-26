@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "description": "",
     "main": "dist/backend/main.js",
-    "license": "MIT",
+    "license": "GNU GPL V3",
     "files": [
         "dist/",
         "src/"
@@ -61,7 +61,11 @@
         "ultra-runner": "3.5.0"
     },
     "dependencies": {
+        "@keyv/sqlite": "^2.0.2",
         "@toes/core": "dev",
+        "@types/keyv": "^3.1.1",
+        "@types/keyv__sqlite": "^2.0.1",
+        "ajv": "^6.12.6",
         "axios": "^0.21.0",
         "bcrypt": "^5.0.0",
         "chalk": "^4.1.0",
@@ -70,16 +74,19 @@
         "connect-redis": "^5.0.0",
         "express": "^4.17.1",
         "express-session": "^1.17.1",
-        "handy-redis": "^2.0.1",
+        "flash-store": "^0.20.6",
         "http-proxy": "^1.18.1",
+        "keyv": "^4.0.3",
         "mime": "^2.4.6",
-        "node-forge": "^0.10.0",
         "plumbing-toolkit": "^1.2.0",
         "preact": "^10.5.5",
         "preact-router": "^3.2.1",
         "pretty-json-stringify": "0.0.2",
+        "quick.db": "^7.1.3",
+        "rate-limiter-flexible": "^2.1.13",
         "reflect-metadata": "^0.1.13",
         "routing-controllers": "^0.9.0-alpha.6",
+        "typed-path": "^2.0.2",
         "typedi": "^0.8.0",
         "unistore": "^3.5.2"
     },

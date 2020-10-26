@@ -1,6 +1,7 @@
 node_modules
 .cache
 dist
-config/*.json
-!config/sample.json
 package-lock.json
+yarn.lock
+.dccache
+*.sqlite

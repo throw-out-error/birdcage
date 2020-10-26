@@ -1,72 +1,69 @@
-import { loadConfig, Config, updateConfig } from "./libs/config";
+import { store, tc } from "./libs/config";
 import { ReverseProxy } from "./server";
 import { Route, TargetOptions } from "src/shared/api";
 import { Service } from "typedi";
 
 @Service()
 export class RouteStorage {
-    private config!: Config;
     constructor(
-        private readonly path: string,
         private readonly production: boolean,
         private readonly proxy: ReverseProxy
     ) {}
 
     async load() {
-        this.config = await loadConfig(this.path);
-        for (const route of this.config.routes) this.registerRoute(route);
+        for (const route of await this.getRoutes()) this.registerRoute(route);
     }
 
-    getRoutes(): Route[] {
-        return this.config.routes;
+    async getRoutes(): Promise<Route[]> {
+        return (store.get(tc.routes.$path) as Route[]) ?? [];
     }
 
     private registerRoute(route: Route) {
         if (route.target.proxyUri) this.proxy.register(route);
     }
 
-    private findRoute(
+    private async findRoute(
         source: string,
         target: TargetOptions
-    ): { route: Route; idx: number } | undefined {
-        const idx = this.config.routes.findIndex(
+    ): Promise<{ route: Route; idx: number } | undefined> {
+        const routes = await this.getRoutes();
+        const idx = routes.findIndex(
             (r) => r.source === source && r.target === target
         );
-        return idx >= 0 ? { route: this.config.routes[idx], idx } : undefined;
+        return idx >= 0 ? { route: routes[idx], idx } : undefined;
     }
 
-    public getRoute(source: string, target: TargetOptions): Route | undefined {
-        const result = this.findRoute(source, target);
+    public async getRoute(
+        source: string,
+        target: TargetOptions
+    ): Promise<Route | undefined> {
+        const result = await this.findRoute(source, target);
+        console.log(JSON.stringify(result));
         return result ? result.route : undefined;
     }
 
-    private removeRoute(idx: number) {
-        this.config.routes.splice(idx, 1);
+    private async removeRoute(idx: number) {
+        store.set(tc.routes.$path, (await this.getRoutes()).splice(idx, 1));
     }
 
     async register(route: Route) {
         if (route.ssl && route.email === "")
             throw new Error("Need to specify an email address when using ssl");
 
-        const result = this.findRoute(route.source, route.target);
+        const result = await this.findRoute(route.source, route.target);
         if (result) {
             this.removeRoute(result.idx);
             this.proxy.unregister(route);
         }
         this.registerRoute(route);
-        this.config.routes = [route, ...this.config.routes];
-        return updateConfig<Config>({ routes: this.config.routes }, this.path);
+        store.set(tc.routes.$path, [route, ...(await this.getRoutes())]);
     }
 
     async unregister(source: string, target: TargetOptions) {
-        const result = this.findRoute(source, target);
+        const result = await this.findRoute(source, target);
         if (result) {
             this.removeRoute(result.idx);
-            this.proxy.unregister(result.route);
-            return updateConfig<Config>(
-                { routes: this.config.routes },
-                this.path
-            );
+            return this.proxy.unregister(result.route);
         }
         throw new Error("Route doesn't exist!");
     }
