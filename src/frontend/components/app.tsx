@@ -34,6 +34,7 @@ export class App extends Component<AppProps, AppState> {
             color: localStorage.getItem("color") || "#7D7DDD",
             bgtag: localStorage.getItem("bgtag") || "colorful",
         };
+        this.onAuth = this.onAuth.bind(this);
     }
 
     loadBackground(bgtag: string): void {
@@ -62,7 +63,7 @@ export class App extends Component<AppProps, AppState> {
     }
 
     toggleSettings(): void {
-        this.setState({ settings: !this.state.settings });
+        this.setState((state) => ({ settings: !state.settings }));
     }
 
     async onLogout() {

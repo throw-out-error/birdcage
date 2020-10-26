@@ -19,12 +19,9 @@ export class Checkbox extends Component<CheckboxProps, CheckboxState> {
         };
     }
 
-    componentDidMount() {}
-
-    handleClick() {
-        const checked = !this.state.checked;
-        this.setState({ checked });
-        this.props.onChanged(checked);
+    handleClick(): void {
+        this.setState((state) => ({ ...state, checked: !state.checked }));
+        this.props.onChanged(this.state.checked);
     }
 
     render() {

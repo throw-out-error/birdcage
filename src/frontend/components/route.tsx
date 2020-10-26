@@ -22,7 +22,7 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
         };
     }
 
-    async onDelete() {
+    async onDelete(): Promise<void> {
         const { source, target } = this.props.route;
         const { data } = await api.delete(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
@@ -39,7 +39,7 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
         }
     }
 
-    async onUpdate() {
+    async onUpdate(): Promise<void> {
         const { source, target } = this.props.route;
         const { data } = await api.put(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
@@ -57,12 +57,12 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
         }
     }
 
-    setRoute<K extends keyof Route>(key: K, value: Route[K]) {
+    setRoute<K extends keyof Route>(key: K, value: Route[K]): void {
         this.setState({ route: { ...this.props.route, [key]: value } });
     }
 
-    toggleExpansion() {
-        this.setState({ expanded: !this.state.expanded });
+    toggleExpansion(): void {
+        this.setState((state) => ({ ...state, expanded: !state.expanded }));
     }
 
     render(props: RouteProps, state: RouteState) {

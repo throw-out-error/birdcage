@@ -36,12 +36,12 @@ export async function main(): Promise<void> {
 
     const proxy = new BirdServer({
         httpPort: store.get(tc.ports.http.$path) as number,
-        auth: async (route, req, res, next) => {
+        auth: async (route, req) => {
             if (!route || !route.auth) return true;
             if (!req.headers.authorization) return false;
             return auth.checkPassword(req.headers["authorization"]);
         },
-        notFound: async (req, res) => {
+        notFound: async (_, res) => {
             res.send(page404);
         },
     });
@@ -61,7 +61,11 @@ export async function main(): Promise<void> {
             secret: store.get(tc.secrets.session.$path) as string,
             resave: false,
             saveUninitialized: true,
-            cookie: {},
+            cookie: {
+                // TODO: https on admin panel
+                secure: false,
+                httpOnly: true,
+            },
         })
     );
 

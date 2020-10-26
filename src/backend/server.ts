@@ -14,6 +14,7 @@ import fs from "fs";
 import mime from "mime";
 import { Route } from "../shared/api";
 import { log } from "./libs/utils";
+import path from "path";
 
 export interface BirdConfig {
     httpPort?: number;
@@ -77,16 +78,19 @@ export class BirdServer implements ReverseProxy<BirdServer> {
             const u = url.parse(req.url);
             const route = this.routes[req.get("host") ?? "example.com"];
             if (!route) return this.store.notFound(req, res);
-            const match = isStatic.exec(u.pathname!);
+            const match = isStatic.exec(u.pathname ?? "/");
             if (match && route.target.webroot) {
-                const path = `${route.target.webroot}/${match[1]}`;
-                const exists = fs.existsSync(path);
+                const safePath = path
+                    .normalize(match[1])
+                    .replace(/^(\.\.(\/|\\|$))+/, "");
+                const filePath = path.join(route.target.webroot, safePath);
+                const exists = fs.existsSync(filePath);
                 if (exists) {
                     res.setHeader(
                         "Content-Type",
-                        mime.getType(path) ?? "text/html"
+                        mime.getType(filePath) ?? "text/html"
                     );
-                    return res.sendFile(path);
+                    return res.sendFile(filePath);
                 } else {
                     return this.store.notFound(req, res);
                 }

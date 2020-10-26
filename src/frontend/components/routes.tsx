@@ -20,39 +20,43 @@ export class Routes extends Component<RoutesProps, RoutesState> {
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this.loadRoutes();
     }
 
-    async loadRoutes() {
+    async loadRoutes(): Promise<void> {
         const { data } = await api.get("/routes");
         this.setState({ routes: data });
     }
 
-    async onAdd(route: Route) {
+    async onAdd(route: Route): Promise<void> {
         console.log(route);
-        this.setState({
-            routes: [route, ...this.state.routes],
-        });
+        this.setState((state) => ({
+            ...state,
+            routes: [route, ...state.routes],
+        }));
     }
 
-    async onDelete(route: Route) {
+    async onDelete(route: Route): Promise<void> {
+        const idx = this.state.routes.findIndex(
+            (r) => r.source === route.source && r.target === route.target
+        );
+        if (idx >= 0)
+            this.setState((state) => ({
+                ...state,
+                routes: state.routes.splice(idx, 1),
+            }));
+    }
+
+    async onUpdated(route: Route): Promise<void> {
         const idx = this.state.routes.findIndex(
             (r) => r.source === route.source && r.target === route.target
         );
         if (idx >= 0) {
-            this.state.routes.splice(idx, 1);
-            this.setState({ routes: this.state.routes });
-        }
-    }
-
-    async onUpdated(route: Route) {
-        const idx = this.state.routes.findIndex(
-            (r) => r.source === route.source && r.target === route.target
-        );
-        if (idx >= 0) {
-            this.state.routes[idx] = route;
-            this.setState({ routes: this.state.routes });
+            this.setState((state) => ({
+                ...state,
+                routes: { ...state.routes, [idx]: route },
+            }));
         }
     }
 

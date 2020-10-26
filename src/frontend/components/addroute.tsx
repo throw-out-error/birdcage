@@ -23,9 +23,12 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
         };
     }
 
-    async onAdd() {
+    async onAdd(): Promise<void> {
         if (!this.state.route.email)
-            this.state.route.email = "admin@example.com";
+            this.setState((state) => ({
+                ...state,
+                route: { ...state.route, email: "admin@example.com" },
+            }));
         const { data } = await api.post("/routes", this.state.route);
         if (data.success) {
             this.props.onRouteAdded(this.state.route);
@@ -34,12 +37,12 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
         }
     }
 
-    setRoute<K extends keyof Route>(key: K, value: Route[K]) {
+    setRoute<K extends keyof Route>(key: K, value: Route[K]): void {
         this.setState({ route: { ...this.state.route, [key]: value } });
-        console.log(this.state);
+        // console.log(this.state);
     }
 
-    render(props: AddRouteProps, state: AddRouteState) {
+    render(): h.JSX.Element {
         return (
             <div className="route add expanded">
                 <div className="source">
