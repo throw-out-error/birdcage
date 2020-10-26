@@ -28,7 +28,10 @@ export class RouteStorage {
     ): Promise<{ route: Route; idx: number } | undefined> {
         const routes = await this.getRoutes();
         const idx = routes.findIndex(
-            (r) => r.source === source && r.target === target
+            (r) =>
+                r.source === source &&
+                r.target.proxyUri === target.proxyUri &&
+                r.target.webroot === target.webroot
         );
         return idx >= 0 ? { route: routes[idx], idx } : undefined;
     }

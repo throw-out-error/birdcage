@@ -90,7 +90,7 @@ export class ProxyController {
                 target: JSON.parse(decodeURIComponent(params.target)),
             } as Route;
 
-            log.main.info(route);
+            // log.main.info(JSON.stringify(route));
 
             if (!this.auth.checkAuth(session))
                 throw new Error("Not logged in!");
