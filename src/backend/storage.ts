@@ -38,7 +38,6 @@ export class RouteStorage {
         target: TargetOptions
     ): Promise<Route | undefined> {
         const result = await this.findRoute(source, target);
-        console.log(JSON.stringify(result));
         return result ? result.route : undefined;
     }
 
