@@ -37,7 +37,7 @@ export class App extends Component<AppProps, AppState> {
         this.onAuth = this.onAuth.bind(this);
     }
 
-    loadBackground(bgtag: string): void {
+    loadBackground(): void {
         const bg = new Image();
         bg.src = background;
         bg.onload = () => {
@@ -46,7 +46,7 @@ export class App extends Component<AppProps, AppState> {
     }
 
     async componentDidMount(): Promise<void> {
-        this.loadBackground(this.state.bgtag);
+        this.loadBackground();
         const app = document.getElementById("app-container");
         if (app) app.style.setProperty("--bg-color", this.state.color);
     }
@@ -83,7 +83,7 @@ export class App extends Component<AppProps, AppState> {
 
     onChangeBg(bgtag: string) {
         localStorage.setItem("bgtag", bgtag);
-        this.loadBackground(bgtag);
+        this.loadBackground();
         this.setState({ bgtag: bgtag });
     }
 

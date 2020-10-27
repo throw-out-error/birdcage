@@ -63,6 +63,16 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
                         }
                         onSubmit={this.onAdd.bind(this)}
                     />
+                    <Input
+                        placeholder="Webroot Path"
+                        onChanged={(val) =>
+                            this.setRoute("target", {
+                                ...this.state.route.target,
+                                webroot: val,
+                            })
+                        }
+                        onSubmit={this.onAdd.bind(this)}
+                    />
                 </div>
                 <div className="ssl">
                     <Checkbox

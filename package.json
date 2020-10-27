@@ -12,10 +12,10 @@
         "birdcage": "dist/backend/main.js"
     },
     "scripts": {
-        "dev": "npm run dev-backend && npm run dev-frontend",
-        "build": "npm run build-backend && npm run build-frontend",
-        "build-clean": "npm run clear && npm run build",
-        "start": "node birdcage.js",
+        "dev": "run-p npm run dev-backend dev-frontend",
+        "build": "run-p build-backend build-frontend",
+        "build-clean": "run-s clear && build",
+        "start": "node dist/backend/main.js",
         "build-backend": "cross-env NODE_ENV=production tsc --project tsconfig.backend.json",
         "dev-backend": "ts-node-dev src/backend/main.ts",
         "build-frontend": "cross-env NODE_ENV=production parcel build src/frontend/*.html --public-url . --out-dir ./dist/www/",
