@@ -4,6 +4,7 @@ export interface ITargetOptions {
 }
 
 export interface Route {
+    id: number;
     source: string;
     target: ITargetOptions;
     ssl: boolean;

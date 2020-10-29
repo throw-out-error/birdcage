@@ -31,11 +31,11 @@ const dbConfig: Knex.Config<Knex.Sqlite3ConnectionConfig> = {
     debug: process.env.DB_DEBUG ? true : false,
 };
 
-export const db: () => Knex = () => Knex(dbConfig);
+export const db: Knex = Knex(dbConfig);
 
 export const checkConn = () => {
     log.main.info(`Connecting to database...`);
-    if (db().client.connectionSettings)
+    if (db.client.connectionSettings)
         log.main.info(`Connected to database - OK`);
     else {
         log.main.error(`Failed to connect to database!`);

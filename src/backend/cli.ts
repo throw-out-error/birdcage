@@ -10,10 +10,10 @@ program
     .description("Initializes the tables and columns of the database.")
     .action(() => {
         checkConn();
-        db()
-            .migrate.up()
+        db.migrate
+            .up()
             .catch(console.error)
-            .finally(() => db().destroy());
+            .finally(() => db.destroy());
     });
 
 program
@@ -21,10 +21,10 @@ program
     .description("Removes tables and columns from the database!")
     .action(() => {
         checkConn();
-        db()
-            .migrate.down()
+        db.migrate
+            .down()
             .catch(console.error)
-            .finally(() => db().destroy());
+            .finally(() => db.destroy());
     });
 
 program

@@ -72,7 +72,6 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
         return (
             <div className={`route ${state.expanded ? "expanded" : ""}`}>
                 <div className="source">{this.props.route.source}</div>
-                <div className="target">{this.props.route.target}</div>
                 <button
                     type="button"
                     onClick={this.toggleExpansion.bind(this)}
@@ -84,6 +83,16 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
                         <i className="fa fa-caret-down"></i>
                     )}
                 </button>
+                <div className="target">
+                    Proxy URI:
+                    <div className="target-proxy">
+                        {this.props.route.target.proxyUri}
+                    </div>
+                    Webroot:
+                    <div className="target-webroot">
+                        {this.props.route.target.webroot}
+                    </div>
+                </div>
                 <div className="ssl">
                     <Checkbox
                         label="HTTPS"

@@ -38,26 +38,19 @@ export class Routes extends Component<RoutesProps, RoutesState> {
     }
 
     async onDelete(route: Route): Promise<void> {
-        const idx = this.state.routes.findIndex(
-            (r) => r.source === route.source && r.target === route.target
-        );
-        if (idx >= 0)
-            this.setState((state) => ({
-                ...state,
-                routes: state.routes.splice(idx, 1),
-            }));
+        this.setState((state) => ({
+            ...state,
+            routes: state.routes.filter(
+                (r) => r.source !== route.source && r.target !== route.target
+            ),
+        }));
     }
 
     async onUpdated(route: Route): Promise<void> {
-        const idx = this.state.routes.findIndex(
-            (r) => r.source === route.source && r.target === route.target
-        );
-        if (idx >= 0) {
-            this.setState((state) => ({
-                ...state,
-                routes: { ...state.routes, [idx]: route },
-            }));
-        }
+        this.setState((state) => ({
+            ...state,
+            routes: [...state.routes.filter((r) => r.id !== route.id), route],
+        }));
     }
 
     render(props: RoutesProps, state: RoutesState) {

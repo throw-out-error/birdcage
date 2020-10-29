@@ -2,12 +2,12 @@ import { db } from "../db";
 
 export const up = () => {
     return new Promise<void>((resolve, reject) => {
-        db()
-            .schema.hasTable("routes")
+        db.schema
+            .hasTable("routes")
             .then((hasTable) => {
                 if (!hasTable)
-                    db()
-                        .schema.createTable("routes", (table) => {
+                    db.schema
+                        .createTable("routes", (table) => {
                             table.increments("id").primary().unsigned();
 
                             table.string("source", 255).notNullable();
@@ -22,7 +22,7 @@ export const up = () => {
 
                             table
                                 .timestamp("createdAt")
-                                .defaultTo(db().fn.now());
+                                .defaultTo(new Date().toISOString());
                             table.timestamp("updatedAt");
                         })
                         .then(() => {
@@ -39,19 +39,17 @@ export const up = () => {
 
 export const down = () => {
     return new Promise<void>((resolve, reject) => {
-        db()
-            .schema.hasTable("routes")
-            .then((hasTable) => {
-                if (hasTable)
-                    db()
-                        .schema.dropTable("routes")
-                        .then(() => {
-                            resolve();
-                        })
-                        .catch((err) => {
-                            reject(err);
-                        });
-            });
+        db.schema.hasTable("routes").then((hasTable) => {
+            if (hasTable)
+                db.schema
+                    .dropTable("routes")
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+        });
     });
 };
 

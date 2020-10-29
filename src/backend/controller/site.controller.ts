@@ -17,16 +17,21 @@ export class SiteController {
 
     @Get()
     async getRoutes(req: Request, res: Response) {
-        return !this.auth.checkAuth(req)
-            ? res.json([])
-            : await this.storage.getRoutes();
+        res.json(
+            !this.auth.checkAuth(req)
+                ? res.json([])
+                : await this.storage.getRoutes()
+        );
     }
 
     @Post()
     async addRoute(req: Request, res: Response) {
         try {
             const r: Route = req.body;
-
+            if (!r)
+                throw new Error(
+                    `Invalid request! Make sure you have filled out all required fields.`
+                );
             const validation: boolean =
                 validator.isFQDN(r.source) &&
                 validator.isLength(r.source, { min: 1 });
@@ -62,7 +67,9 @@ export class SiteController {
 
             await this.storage.register(route);
             log.interaction.info(
-                `Updated route: ${route.source} -> ${route.target}`
+                `Updated route: ${route.source} -> ${JSON.stringify(
+                    route.target
+                )}`
             );
             return res.json({ success: true });
         } catch (err) {
@@ -89,10 +96,10 @@ export class SiteController {
                     route.target
                 )}`
             );
-            return { success: true };
+            res.json({ success: true });
         } catch (err) {
             log.main.error(`Error deleting route: ${err.toString()}`);
-            return { success: false, error: err.toString() };
+            res.status(500).json({ success: false, error: err.toString() });
         }
     }
 }

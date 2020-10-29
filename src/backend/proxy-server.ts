@@ -15,6 +15,7 @@ import mime from "mime";
 import { Route } from "../shared/api";
 import { log } from "./libs/utils";
 import path from "path";
+import { db } from "./db";
 
 export interface BirdConfig {
     httpPort?: number;
@@ -28,9 +29,8 @@ export interface BirdConfig {
 }
 
 export interface ReverseProxy<T extends ReverseProxy<T> = BirdServer> {
-    register(route: Route): T;
-    unregister(route: Route): T;
-    getstore(): BirdConfig;
+    reload(): Promise<void>;
+    getConfig(): BirdConfig;
 }
 
 // TODO: create seperate npm package
@@ -40,26 +40,29 @@ export interface ReverseProxy<T extends ReverseProxy<T> = BirdServer> {
  */
 export class BirdServer implements ReverseProxy<BirdServer> {
     store: BirdConfig;
-    routes: Record<string, Route>;
+    routes: Route[];
     app: express.Application;
 
     constructor(opts: BirdConfig) {
         this.store = { ...opts, httpPort: opts.httpPort ?? 9000 };
-        this.routes = {};
+        this.routes = [];
         this.app = express();
-        this.init();
-    }
-    register(route: Route) {
-        this.routes[route.source] = route;
-        return this;
+
+        this.reload().then(() => {
+            this.init();
+        });
     }
 
-    unregister(route: Route) {
-        delete this.routes[route.source];
-        return this;
+    async reload() {
+        this.routes =
+            (await db("routes").select()).map((r) => ({
+                ...r,
+                target: JSON.parse(r.target),
+                auth: r.auth ? JSON.parse(r.auth) : undefined,
+            })) ?? [];
     }
 
-    getstore() {
+    getConfig() {
         return this.store;
     }
 
@@ -69,7 +72,9 @@ export class BirdServer implements ReverseProxy<BirdServer> {
         const isStatic = new RegExp(/\/static\/(.*)/);
 
         this.app.use((req, res, next) => {
-            const route = this.routes[req.get("host") ?? "example.com"];
+            const route = this.routes.find(
+                (r) => r.source === req.get("host") ?? "example.com"
+            );
             if (route && route.auth) {
                 if (this.store.auth(route, req, res, next)) return next();
                 else return res.status(403).send("<h1>Access Denied</h1>");
@@ -77,9 +82,13 @@ export class BirdServer implements ReverseProxy<BirdServer> {
         });
 
         // deepcode ignore NoRateLimitingForExpensiveWebOperation: Custom rate limiter implemented
-        this.app.use((req, res) => {
+        this.app.use(async (req, res) => {
             const u = url.parse(req.url);
-            const route = this.routes[req.get("host") ?? "example.com"];
+            await this.reload();
+            const route = this.routes.find(
+                (r) => r.source === req.get("host") ?? "example.com"
+            );
+            // console.log(route);
             if (!route) return this.store.notFound(req, res);
             const match = isStatic.exec(u.pathname ?? "/");
             if (match && route.target.webroot) {
@@ -106,7 +115,7 @@ export class BirdServer implements ReverseProxy<BirdServer> {
                     {
                         target: route.target.proxyUri,
                     },
-                    () => this.store.notFound(req, res)
+                    (err) => res.status(500).send(err.toString())
                 );
             }
         });

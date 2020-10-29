@@ -12,11 +12,17 @@ export class RouteStorage {
     }
 
     async getRoutes(): Promise<Route[]> {
-        return (await db().select().from("routes")) ?? [];
+        return (
+            (await db("routes").select()).map((r) => ({
+                ...r,
+                target: JSON.parse(r.target),
+                auth: r.auth ? JSON.parse(r.auth) : undefined,
+            })) ?? []
+        );
     }
 
     private registerRoute(route: Route) {
-        if (route.target.proxyUri) this.proxy.register(route);
+        if (route.target) this.proxy.reload();
     }
 
     private async findRoute(
@@ -41,8 +47,8 @@ export class RouteStorage {
         return result ? result.route : undefined;
     }
 
-    private async removeIRoute(id: number) {
-        await db().del().from("routes").where({ id });
+    private async removeRoute(id: number) {
+        await db("routes").where({ id }).del();
     }
 
     async register(route: Route) {
@@ -51,13 +57,14 @@ export class RouteStorage {
 
         const result = await this.findRoute(route.source, route.target);
         if (result) {
-            this.removeIRoute(result.idx);
-            this.proxy.unregister(route);
+            await this.removeRoute(result.route.id);
+            this.proxy.reload();
         }
         this.registerRoute(route);
-        await db()
+        await db
             .insert({
                 ...route,
+                updatedAt: new Date().toISOString(),
                 target: JSON.stringify(route.target),
                 auth: route.auth ? JSON.stringify(route.auth) : undefined,
             })
@@ -67,9 +74,9 @@ export class RouteStorage {
     async unregister(source: string, target: ITargetOptions) {
         const result = await this.findRoute(source, target);
         if (result) {
-            this.removeIRoute(result.idx);
-            return this.proxy.unregister(result.route);
+            await this.removeRoute(result.route.id);
+            return this.proxy.reload();
         }
-        throw new Error("IRoute doesn't exist!");
+        throw new Error("Route doesn't exist!");
     }
 }
