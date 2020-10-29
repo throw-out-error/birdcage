@@ -55,6 +55,7 @@ export class BirdAdmin extends Server {
         const routeStorage = new RouteStorage(this.proxy);
         await routeStorage.load();
 
+        Container.set(BirdServer, this.proxy);
         Container.set(Auth, auth);
         Container.set(RouteStorage, routeStorage);
 

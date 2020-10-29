@@ -11,7 +11,7 @@ export const up = () => {
                             table.increments("id").primary().unsigned();
 
                             table.string("source", 255).notNullable();
-                            table.json("target").notNullable();
+                            table.json("target");
                             table.boolean("ssl").notNullable();
                             table.string("email").notNullable();
 

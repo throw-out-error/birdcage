@@ -248,7 +248,9 @@ body {
 
                     .route {
                         box-sizing: border-box;
-                        display: grid;
+                        // display: grid;
+                        display: flex;
+                        // flex-direction: column;
                         background-color: rgba(255, 255, 255, 0.1);
                         margin-bottom: calc(#{$row-height} / 5);
                         grid-template:

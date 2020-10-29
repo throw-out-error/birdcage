@@ -1,4 +1,3 @@
-import { Flex } from "@toes/preact-utils";
 import { h, Component } from "preact";
 import { api } from "../../shared/api";
 import { Route } from "../../shared/api";
@@ -45,7 +44,7 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
 
     render(): h.JSX.Element {
         return (
-            <Flex className="route add expanded">
+            <div className="route add expanded">
                 <div className="source">
                     <Input
                         placeholder="Source"
@@ -104,7 +103,7 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
                 >
                     <i className="fa fa-plus"></i>
                 </button>
-            </Flex>
+            </div>
         );
     }
 }

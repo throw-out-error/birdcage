@@ -1,11 +1,11 @@
 import { db } from "./db";
-import { ReverseProxy } from "./proxy-server";
+import { BirdServer } from "./proxy-server";
 import { Route, ITargetOptions } from "src/shared/api";
-import { Service } from "typedi";
+import { Inject, Service } from "typedi";
 
 @Service()
 export class RouteStorage {
-    constructor(private readonly proxy: ReverseProxy) {}
+    constructor(@Inject(() => BirdServer) private readonly proxy: BirdServer) {}
 
     async load(): Promise<void> {
         for (const route of await this.getRoutes()) this.registerRoute(route);
