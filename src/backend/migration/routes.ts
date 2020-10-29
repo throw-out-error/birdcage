@@ -11,11 +11,14 @@ export const up = () => {
                             table.increments("id").primary().unsigned();
 
                             table.string("source", 255).notNullable();
-                            table.json("target");
+                            table.jsonb("target").notNullable();
                             table.boolean("ssl").notNullable();
-                            table.string("email").notNullable();
+                            table
+                                .string("email")
+                                .notNullable()
+                                .defaultTo("admin@example.com");
 
-                            table.json("auth").nullable();
+                            table.jsonb("auth").nullable();
 
                             table
                                 .timestamp("createdAt")

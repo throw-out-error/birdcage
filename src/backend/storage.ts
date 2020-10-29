@@ -55,7 +55,13 @@ export class RouteStorage {
             this.proxy.unregister(route);
         }
         this.registerRoute(route);
-        await db().insert(route).returning("*").into("routes");
+        await db()
+            .insert({
+                ...route,
+                target: JSON.stringify(route.target),
+                auth: route.auth ? JSON.stringify(route.auth) : undefined,
+            })
+            .into("routes");
     }
 
     async unregister(source: string, target: ITargetOptions) {

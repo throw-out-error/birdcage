@@ -29,6 +29,7 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
                 ...state,
                 route: { ...state.route, email: "admin@example.com" },
             }));
+        console.log(this.state.route);
         const { data } = await api.post("/routes", this.state.route);
         if (data.success) {
             this.props.onRouteAdded(this.state.route);

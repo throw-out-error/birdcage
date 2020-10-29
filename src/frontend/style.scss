@@ -132,6 +132,7 @@ body {
             outline: none;
             cursor: pointer;
             font-size: 16px;
+            height: calc(#{$row-height} / 2);
             border: 1px solid;
             border-color: transparent;
             transition: border-color 0.2s, background-color 0.2s;
@@ -295,7 +296,6 @@ body {
                         .addbtn {
                             grid-column: 2;
                             width: 36px;
-                            height: calc(#{$row-height} / 2);
                             justify-self: right;
                         }
 

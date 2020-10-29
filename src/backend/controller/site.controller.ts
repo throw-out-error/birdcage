@@ -40,7 +40,7 @@ export class SiteController {
             if (await this.storage.getRoute(r.source, r.target))
                 throw new Error("Route already exists!");
 
-            await this.storage.register(req.body);
+            await this.storage.register(r);
             log.interaction.info(
                 `Added route: ${r.source} -> ${JSON.stringify(r.target)}`
             );
