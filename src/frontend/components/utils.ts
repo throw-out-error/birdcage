@@ -1,4 +1,3 @@
-import { Provider, connect } from "unistore/preact";
 import createStore from "unistore";
 
 export const store = createStore({

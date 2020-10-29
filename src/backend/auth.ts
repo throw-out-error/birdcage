@@ -1,20 +1,22 @@
-import { store, tc } from "./libs/config";
+import { config, writeCfg } from "./libs/config";
 import { hash, compare } from "bcrypt";
 import { Service } from "typedi";
+import { Request } from "express";
 
 @Service()
 export class Auth {
     private password = "";
 
     async load(): Promise<void> {
-        this.password = store.get(tc.secrets.adminPassword.$path) as string;
+        this.password = config.secrets.adminPassword;
     }
 
-    checkAuth = (session: Express.Session) => !!(session && session.authed);
+    checkAuth = (req: Request) => !!(req.session && req.session.authed);
 
     async setPassword(pw: string): Promise<boolean> {
         this.password = await hash(pw, 10);
-        store.set(tc.secrets.adminPassword.$path, this.password);
+        config.secrets.adminPassword = this.password;
+        writeCfg();
         return true;
     }
 

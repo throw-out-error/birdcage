@@ -1,12 +1,8 @@
-import { Route } from "../../shared/api";
-import { existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import yaml from "yaml";
+import { existsSync, writeFileSync } from "fs";
 import { IRateLimiterOptions } from "rate-limiter-flexible";
 import Ajv from "ajv";
-import { typedPath as tp } from "typed-path";
-import Keyv from "keyv";
-import db from "quick.db";
-import { path, randomSequence, ValueOf } from "./utils";
+import { loadConfiguration } from "@toes/core";
 
 export interface Config {
     ports: {
@@ -18,14 +14,14 @@ export interface Config {
     certificates: string;
     paths: {
         notFound: string;
+        database?: string;
     };
     secrets: {
         session: string;
+        // TODO: create users database table
         adminPassword: string;
     };
-    routes: Route[];
     apiLimits: IRateLimiterOptions;
-    production: boolean;
 }
 
 export const configSchema = {
@@ -68,57 +64,21 @@ export const configSchema = {
     },
 };
 
-export const storeDir =
-    process.env.NODE_ENV === "production"
-        ? join(__dirname, "..", "..", "..", "data", "prod.sqlite")
-        : join(__dirname, "..", "..", "..", "data", "dev.sqlite");
-
-export const store = new db.table("admin");
 export const ajv = new Ajv({ allErrors: true });
 export const validateConfig = ajv.compile(configSchema);
-export const tc = tp<Config>(["config"]);
 
-export const initStore = async () => {
-    /*
-    {
-        "session_secret": "replace me",
-        "admin_password": "",
-        "http2": true,
-        "ports": {
-            "http": 80,
-            "https": 443,
-            "letsencrypt": 9990,
-            "admin": 3330
-        },
-        "apiLimits": {
-            "duration": 1,
-            "points": 75
-        },
-        "certificates": "/etc/letsencrypt",
-        "production": false,
-        "404path": "../dist/www/404.html",
-        "routes": []
-    }
-    */
-    if (!store.has(tc.secrets.adminPassword.$path))
-        store.set(tc.secrets.adminPassword.$path, "");
+export const env = process.env.NODE_ENV === "production" ? "prod" : "dev";
+export const cfgPath = `config/${env}.yml`;
 
-    if (!store.has(tc.secrets.session.$path))
-        store.set(tc.secrets.session.$path, randomSequence(12));
-    if (!store.has(tc.paths.notFound.$path))
-        store.set(
-            tc.paths.notFound.$path,
-            path("..", "..", "..", "dist", "www", "404.html")
-        );
-    if (!store.has(tc.apiLimits.$path))
-        store.set(tc.apiLimits.$path, { duration: 1, points: 75 });
-    if (!store.has(tc.ports.$path))
-        store.set(tc.ports.$path, {
-            http: 80,
-            https: 443,
-            letsencrypt: 9990,
-            admin: 3330,
-        });
-    if (!store.has(tc.routes.$path)) store.set(tc.routes.$path, []);
-    if (!store.has(tc.production.$path)) store.set(tc.production.$path, false);
-};
+export const loadCfg = (): Config =>
+    loadConfiguration<Config>({
+        env,
+        defaultConfig: "config/example.yml",
+    });
+
+export const writeCfg = (): void =>
+    writeFileSync(cfgPath, yaml.stringify(config), { encoding: "utf-8" });
+
+export const config: Config = loadCfg();
+
+if (!existsSync(cfgPath)) writeCfg();

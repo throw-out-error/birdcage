@@ -1,21 +1,18 @@
-import { store, tc } from "./libs/config";
-import { ReverseProxy } from "./server";
-import { Route, TargetOptions } from "src/shared/api";
+import { db } from "./db";
+import { ReverseProxy } from "./proxy-server";
+import { Route, ITargetOptions } from "src/shared/api";
 import { Service } from "typedi";
 
 @Service()
 export class RouteStorage {
-    constructor(
-        private readonly production: boolean,
-        private readonly proxy: ReverseProxy
-    ) {}
+    constructor(private readonly proxy: ReverseProxy) {}
 
-    async load() {
+    async load(): Promise<void> {
         for (const route of await this.getRoutes()) this.registerRoute(route);
     }
 
     async getRoutes(): Promise<Route[]> {
-        return (store.get(tc.routes.$path) as Route[]) ?? [];
+        return (await db.select().from("routes")) ?? [];
     }
 
     private registerRoute(route: Route) {
@@ -24,7 +21,7 @@ export class RouteStorage {
 
     private async findRoute(
         source: string,
-        target: TargetOptions
+        target: ITargetOptions
     ): Promise<{ route: Route; idx: number } | undefined> {
         const routes = await this.getRoutes();
         const idx = routes.findIndex(
@@ -38,14 +35,14 @@ export class RouteStorage {
 
     public async getRoute(
         source: string,
-        target: TargetOptions
+        target: ITargetOptions
     ): Promise<Route | undefined> {
         const result = await this.findRoute(source, target);
         return result ? result.route : undefined;
     }
 
-    private async removeRoute(idx: number) {
-        store.set(tc.routes.$path, (await this.getRoutes()).splice(idx, 1));
+    private async removeIRoute(id: number) {
+        await db.del().from("routes").where({ id });
     }
 
     async register(route: Route) {
@@ -54,19 +51,19 @@ export class RouteStorage {
 
         const result = await this.findRoute(route.source, route.target);
         if (result) {
-            this.removeRoute(result.idx);
+            this.removeIRoute(result.idx);
             this.proxy.unregister(route);
         }
         this.registerRoute(route);
-        store.set(tc.routes.$path, [route, ...(await this.getRoutes())]);
+        await db.insert(route).returning("*").into("routes");
     }
 
-    async unregister(source: string, target: TargetOptions) {
+    async unregister(source: string, target: ITargetOptions) {
         const result = await this.findRoute(source, target);
         if (result) {
-            this.removeRoute(result.idx);
+            this.removeIRoute(result.idx);
             return this.proxy.unregister(result.route);
         }
-        throw new Error("Route doesn't exist!");
+        throw new Error("IRoute doesn't exist!");
     }
 }

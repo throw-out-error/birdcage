@@ -1,7 +1,10 @@
 node_modules
 .cache
+.parcel-cache
 dist
 package-lock.json
 yarn.lock
 .dccache
 *.sqlite
+config/*.yml
+!config/example.yml

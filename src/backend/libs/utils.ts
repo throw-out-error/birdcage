@@ -3,7 +3,6 @@ import { ConsoleLogger, PrefixLogger } from "@toes/core";
 import { join } from "path";
 export { chalk };
 
-export type ReqBody = Record<string, never>;
 export type ValueOf<T> = T[keyof T];
 
 export const path = (...str: string[]) => join(__dirname, ...str);

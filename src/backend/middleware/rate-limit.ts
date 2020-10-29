@@ -1,13 +1,11 @@
-import { store, tc } from "../libs/config";
+import { config } from "../libs/config";
 import { RateLimiterMemory, IRateLimiterOptions } from "rate-limiter-flexible";
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
 export const createRateLimit = async (
     err?: () => unknown
 ): Promise<RequestHandler> => {
-    const rateLimiter = new RateLimiterMemory(
-        store.get(tc.apiLimits.$path) as IRateLimiterOptions
-    );
+    const rateLimiter = new RateLimiterMemory(config.apiLimits);
 
     return (req: Request, res: Response, next: NextFunction) => {
         rateLimiter

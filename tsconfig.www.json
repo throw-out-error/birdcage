@@ -1,0 +1,5 @@
+{
+    "extends": "./tsconfig.json",
+    "exclude": ["src/backend"],
+    "compilerOptions": { "outDir": "dist/www" }
+}

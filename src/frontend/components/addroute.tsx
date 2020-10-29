@@ -1,5 +1,6 @@
+import { Flex } from "@toes/preact-utils";
 import { h, Component } from "preact";
-import { api } from "../api";
+import { api } from "../../shared/api";
 import { Route } from "../../shared/api";
 import { Checkbox } from "./checkbox";
 import { Input } from "./input";
@@ -44,7 +45,7 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
 
     render(): h.JSX.Element {
         return (
-            <div className="route add expanded">
+            <Flex className="route add expanded">
                 <div className="source">
                     <Input
                         placeholder="Source"
@@ -52,41 +53,49 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
                         onSubmit={this.onAdd.bind(this)}
                     />
                 </div>
-                <div className="target">
-                    <Input
-                        placeholder="Proxied URI"
-                        onChanged={(val) =>
-                            this.setRoute("target", {
-                                ...this.state.route.target,
-                                proxyUri: val,
-                            })
-                        }
-                        onSubmit={this.onAdd.bind(this)}
-                    />
-                    <Input
-                        placeholder="Webroot Path"
-                        onChanged={(val) =>
-                            this.setRoute("target", {
-                                ...this.state.route.target,
-                                webroot: val,
-                            })
-                        }
-                        onSubmit={this.onAdd.bind(this)}
-                    />
+                <div className="target" style={{ display: "inline" }}>
+                    <div className="target-proxy">
+                        <Input
+                            placeholder="Proxied URI"
+                            onChanged={(val) =>
+                                this.setRoute("target", {
+                                    ...this.state.route.target,
+                                    proxyUri: val,
+                                })
+                            }
+                            onSubmit={this.onAdd.bind(this)}
+                        />
+                    </div>
+                    <div className="target-webroot">
+                        <Input
+                            placeholder="Webroot Path"
+                            onChanged={(val) =>
+                                this.setRoute("target", {
+                                    ...this.state.route.target,
+                                    webroot: val,
+                                })
+                            }
+                            onSubmit={this.onAdd.bind(this)}
+                        />
+                    </div>
                 </div>
-                <div className="ssl">
-                    <Checkbox
-                        label="HTTPS"
-                        checked={false}
-                        onChanged={(checked) => this.setRoute("ssl", checked)}
-                    />
-                </div>
-                <div className="email">
-                    <Input
-                        placeholder="Owner email"
-                        onChanged={(val) => this.setRoute("email", val)}
-                        onSubmit={this.onAdd.bind(this)}
-                    />
+                <div className="ssl-input" style={{ display: "inline" }}>
+                    <div className="email">
+                        <Input
+                            placeholder="Owner email"
+                            onChanged={(val) => this.setRoute("email", val)}
+                            onSubmit={this.onAdd.bind(this)}
+                        />
+                    </div>
+                    <div className="ssl">
+                        <Checkbox
+                            label="HTTPS"
+                            checked={false}
+                            onChanged={(checked) =>
+                                this.setRoute("ssl", checked)
+                            }
+                        />
+                    </div>
                 </div>
                 <button
                     type="button"
@@ -95,7 +104,7 @@ export class AddRoute extends Component<AddRouteProps, AddRouteState> {
                 >
                     <i className="fa fa-plus"></i>
                 </button>
-            </div>
+            </Flex>
         );
     }
 }

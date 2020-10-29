@@ -1,5 +1,5 @@
 import { h, Component } from "preact";
-import { api } from "../api";
+import { api, IResponse } from "../../shared/api";
 import { Route } from "../../shared/api";
 import { Checkbox } from "./checkbox";
 import { Input } from "./input";
@@ -24,7 +24,7 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
 
     async onDelete(): Promise<void> {
         const { source, target } = this.props.route;
-        const { data } = await api.delete(
+        const res = await api.delete(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
                 JSON.stringify({
                     proxyUri: target.proxyUri,
@@ -32,6 +32,7 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
                 } as Route["target"])
             )}`
         );
+        const data: IResponse = res.data as IResponse;
         if (data.success) {
             this.props.onDeleted(this.props.route);
         } else {
@@ -41,7 +42,7 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
 
     async onUpdate(): Promise<void> {
         const { source, target } = this.props.route;
-        const { data } = await api.put(
+        const res = await api.put(
             `/routes/${encodeURIComponent(source)}/${encodeURIComponent(
                 JSON.stringify({
                     proxyUri: target.proxyUri,
@@ -50,6 +51,8 @@ export class RouteEntry extends Component<RouteProps, RouteState> {
             )}`,
             this.state.route
         );
+        const data: IResponse = res.data as IResponse;
+
         if (data.success) {
             this.props.onUpdated(this.state.route);
         } else {

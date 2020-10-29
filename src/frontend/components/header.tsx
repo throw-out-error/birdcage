@@ -26,7 +26,7 @@ export class Header extends Component<HeaderProps, { authed: boolean }> {
             <div className="header">
                 <span className="logo" />
                 <span className="logo-text">
-                    <Link href="/">Birdcage</Link>
+                    <Link href="/panel">Birdcage</Link>
                 </span>
                 <nav className="header-navbar">
                     {!this.state.authed ? (
@@ -36,7 +36,7 @@ export class Header extends Component<HeaderProps, { authed: boolean }> {
                                 display: "inline",
                             }}
                         >
-                            <Link href="/login">Login</Link>
+                            <Link href="/panel/login">Login</Link>
                         </ul>
                     ) : (
                         <ul
@@ -45,7 +45,8 @@ export class Header extends Component<HeaderProps, { authed: boolean }> {
                                 display: "inline",
                             }}
                         >
-                            <Link href="/routes">Routes</Link>
+                            <Link href="/panel/routes">Routes</Link>
+                            <Link href="/panel/settings">Settings</Link>
                         </ul>
                     )}
                 </nav>

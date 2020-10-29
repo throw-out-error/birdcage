@@ -1,6 +1,11 @@
 import { h, Component, RefObject } from "preact";
-import { LoginPage, RouteManagementPage, HomePage } from "./pages";
-import { api } from "../api";
+import {
+    LoginPage,
+    RouteManagementPage,
+    HomePage,
+    SettingsPage,
+} from "./pages";
+import { api } from "../../shared/api";
 import Router, { Route, route } from "preact-router";
 import background from "../img/background.jpg";
 import { Header } from "./header";
@@ -106,12 +111,23 @@ export class App extends Component<AppProps, AppState> {
                         />
                         <div className="body">
                             <Router>
-                                <LoginPage path="/login" onAuth={this.onAuth} />
+                                <LoginPage
+                                    path="/panel/login"
+                                    onAuth={this.onAuth}
+                                />
                                 <RouteManagementPage
-                                    path="/routes"
+                                    path="/panel/routes"
                                     ref={this.state.pages.routeManagement}
                                 />
-                                <Route path="/" default component={HomePage} />
+                                <Route
+                                    path="/panel/settings"
+                                    component={SettingsPage}
+                                />
+                                <Route
+                                    path="/panel"
+                                    default
+                                    component={HomePage}
+                                />
                             </Router>
                         </div>
                     </div>

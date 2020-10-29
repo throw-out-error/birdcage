@@ -35,6 +35,9 @@ export interface ReverseProxy<T extends ReverseProxy<T> = BirdServer> {
 
 // TODO: create seperate npm package
 
+/**
+ * Birdcage proxy server
+ */
 export class BirdServer implements ReverseProxy<BirdServer> {
     store: BirdConfig;
     routes: Record<string, Route>;
@@ -97,12 +100,15 @@ export class BirdServer implements ReverseProxy<BirdServer> {
             } else {
                 if (!route.target.proxyUri)
                     return this.store.notFound(req, res);
-                return proxy.web(req, res, {
-                    target: route.target.proxyUri,
-                });
+                return proxy.web(
+                    req,
+                    res,
+                    {
+                        target: route.target.proxyUri,
+                    },
+                    () => this.store.notFound(req, res)
+                );
             }
         });
-
-        log.main.info("listening at port http://localhost:" + port + "/");
     }
 }

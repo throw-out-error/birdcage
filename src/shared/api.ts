@@ -1,32 +1,11 @@
-import {
-    ValidateIf,
-    IsFQDN,
-    Length,
-    IsUrl,
-    IsBoolean,
-    IsDefined,
-    IsEmail,
-    IsNotEmptyObject,
-} from "class-validator";
-
-export class TargetOptions {
-    @ValidateIf(
-        (o: TargetOptions) => o.webroot !== undefined && o.webroot !== null
-    )
-    @Length(3)
+export interface ITargetOptions {
     webroot?: string;
-
-    @ValidateIf(
-        (o: TargetOptions) => o.proxyUri !== undefined && o.proxyUri !== null
-    )
-    @Length(1)
-    @IsUrl()
     proxyUri?: string;
 }
 
-export interface IRoute {
+export interface Route {
     source: string;
-    target: TargetOptions;
+    target: ITargetOptions;
     ssl: boolean;
     email: string;
     /**
@@ -35,26 +14,11 @@ export interface IRoute {
     auth?: string[] | string;
 }
 
-export class Route implements IRoute {
-    @Length(1)
-    @IsFQDN()
-    @IsDefined()
-    source = "example.com";
-    @IsDefined()
-    @IsNotEmptyObject()
-    target: TargetOptions = {};
-    @IsDefined()
-    @IsBoolean()
-    ssl = false;
-
-    @ValidateIf((o: IRoute) => o.email !== undefined && o.email !== null)
-    @IsEmail()
-    email = "admin@example.com";
-
-    auth?: string | string[] | undefined;
+export interface Site {
+    routes: Route[];
 }
 
-export interface Response {
+export interface IResponse {
     success: boolean;
     error?: string;
 }
@@ -70,22 +34,22 @@ export interface AdminAPI {
             body: {
                 password: string;
             };
-            response: Response;
+            response: IResponse;
         };
         PUT: {
             body: {
                 password: string;
             };
-            response: Response;
+            response: IResponse;
         };
         DELETE: {
-            response: Response;
+            response: IResponse;
         };
     };
     "/routes": {
         POST: {
             body: Route;
-            response: Response;
+            response: IResponse;
         };
         GET: {
             response: Route[];
@@ -98,14 +62,16 @@ export interface AdminAPI {
                 target: string;
             };
             body: Route;
-            response: Response;
+            response: IResponse;
         };
         DELETE: {
             params: {
                 source: string;
                 target: string;
             };
-            response: Response;
+            response: IResponse;
         };
     };
 }
+
+export * from "./client";

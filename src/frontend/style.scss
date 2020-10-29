@@ -1,5 +1,11 @@
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
 @import url(https://fonts.googleapis.com/css?family=Montserrat);
+$row-height: 50px;
+
+ul a {
+    padding-right: 10px;
+    font-size: 18px;
+}
 
 body {
     font-family: Montserrat, bold;
@@ -102,7 +108,8 @@ body {
             box-sizing: border-box;
             width: 100%;
             padding-left: 5px;
-            height: 100%;
+            height: $row-height;
+            max-height: 100%;
             background: none;
             border: none;
             outline: none;
@@ -190,22 +197,21 @@ body {
                 z-index: 2;
 
                 .settings {
-                    --row-height: 50px;
                     box-sizing: border-box;
                     position: absolute;
                     left: 50%;
                     top: 50%;
                     transform: translate(-50%, -50%);
                     display: grid;
-                    grid-template: var(--row-height) / 100%;
-                    grid-auto-rows: var(--row-height);
+                    grid-template: calc(#{$row-height}) / 100%;
+                    grid-auto-rows: $row-height;
                     grid-gap: 10px;
                     padding: 20px;
                     width: 100%;
 
                     .setting {
                         display: grid;
-                        grid-template: 100% / auto var(--row-height);
+                        grid-template: 100% / auto $row-height;
                     }
                 }
 
@@ -241,17 +247,14 @@ body {
                     margin-top: 10px;
 
                     .route {
-                        --row-height: 50px;
                         box-sizing: border-box;
                         display: grid;
                         background-color: rgba(255, 255, 255, 0.1);
-                        margin-bottom: calc(var(--row-height) / 5);
+                        margin-bottom: calc(#{$row-height} / 5);
                         grid-template:
-                            var(--row-height) var(--row-height) var(
-                                --row-height
-                            )
-                            / 1fr 1fr var(--row-height);
-                        height: var(--row-height);
+                            $row-height $row-height calc(#{$row-height} / 1fr)
+                            1fr $row-height;
+                        min-height: calc(#{$row-height});
                         transition: height 0.2s;
                         width: 100%;
                         overflow: hidden;
@@ -263,10 +266,10 @@ body {
 
                         &.add {
                             grid-template:
-                                var(--row-height) var(--row-height) var(
-                                    --row-height
+                                $row-height $row-height calc(
+                                    #{$row-height} / 1fr
                                 )
-                                / 1fr 1fr;
+                                1fr;
                         }
 
                         .only-expanded {
@@ -275,7 +278,7 @@ body {
                         }
 
                         &.expanded {
-                            height: calc(var(--row-height) * 3);
+                            min-height: calc(#{$row-height} * 4);
                             .only-expanded {
                                 opacity: 1;
                             }
@@ -290,6 +293,7 @@ body {
                         .addbtn {
                             grid-column: 2;
                             width: 36px;
+                            height: calc(#{$row-height} / 2);
                             justify-self: right;
                         }
 

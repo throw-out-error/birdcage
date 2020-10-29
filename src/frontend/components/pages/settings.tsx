@@ -1,8 +1,8 @@
 import { h, Component } from "preact";
 import { Settings } from "../settings";
+import { store } from "../utils";
 
 export interface SettingsPageProps {
-    settings: boolean;
     color: string;
     bgtag: string;
     toggleSettings(): void;
@@ -13,13 +13,25 @@ export interface SettingsPageProps {
 export class SettingsPage extends Component<SettingsPageProps> {
     render() {
         return (
-            <div className={this.props.settings ? "overlay" : "hidden"}>
+            <div className={store.getState().authed ? "overlay" : "hidden"}>
                 <Settings
-                    onClose={this.props.toggleSettings.bind(this)}
+                    onClose={
+                        this.props.toggleSettings
+                            ? this.props.toggleSettings.bind(this)
+                            : () => null
+                    }
                     color={this.props.color}
-                    onChangeColor={this.props.onChangeColor.bind(this)}
+                    onChangeColor={
+                        this.props.onChangeColor
+                            ? this.props.onChangeColor.bind(this)
+                            : () => null
+                    }
                     bgtag={this.props.bgtag}
-                    onChangeBg={this.props.onChangeBg.bind(this)}
+                    onChangeBg={
+                        this.props.onChangeBg
+                            ? this.props.onChangeBg.bind(this)
+                            : () => null
+                    }
                 />
             </div>
         );
