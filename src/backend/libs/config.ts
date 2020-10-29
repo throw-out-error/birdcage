@@ -71,14 +71,14 @@ export const env = process.env.NODE_ENV === "production" ? "prod" : "dev";
 export const cfgPath = `config/${env}.yml`;
 
 export const loadCfg = (): Config =>
-    loadConfiguration<Config>({
+    (config = loadConfiguration<Config>({
         env,
         defaultConfig: "config/example.yml",
-    });
+    }));
 
 export const writeCfg = (): void =>
     writeFileSync(cfgPath, yaml.stringify(config), { encoding: "utf-8" });
 
-export const config: Config = loadCfg();
-
+export let config: Config = loadCfg();
+// console.log(config);
 if (!existsSync(cfgPath)) writeCfg();

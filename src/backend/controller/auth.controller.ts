@@ -2,12 +2,12 @@ import { Controller, Get, Post, Put, Delete } from "@overnightjs/core";
 import { Request, Response } from "express";
 import { log } from "../libs/utils";
 import { Auth } from "../auth";
-import { Service } from "typedi";
+import { Inject, Service } from "typedi";
 
 @Controller("auth")
 @Service()
 export class AuthController {
-    constructor(private auth: Auth) {}
+    constructor(@Inject(() => Auth) private auth: Auth) {}
 
     @Get()
     async isAuthed(req: Request, res: Response) {
@@ -49,11 +49,13 @@ export class AuthController {
             if (await this.auth.checkPassword(pw)) {
                 if (req.session) req.session.authed = true;
                 return res.json({ success: true });
-            } else
+            } else {
+                if (req.session) req.session.authed = false;
                 return res.status(400).json({
                     success: false,
                     error: "Wrong password!",
                 });
+            }
         } catch (err) {
             log.main.error(`Error checking password: ${err.toString()}`);
             return res

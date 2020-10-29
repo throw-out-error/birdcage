@@ -12,6 +12,7 @@ import { Auth } from "./auth";
 import { Container } from "typedi";
 import { Server } from "@overnightjs/core";
 import { ApiController } from "./controller/api.controller";
+import { checkConn, db } from "./db";
 
 export class BirdAdmin extends Server {
     proxy!: BirdServer;
@@ -19,7 +20,10 @@ export class BirdAdmin extends Server {
     constructor() {
         super();
 
-        this.init();
+        this.init().catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
     }
 
     async init(): Promise<void> {
@@ -28,6 +32,7 @@ export class BirdAdmin extends Server {
             throw new Error(
                 `Invalid config: ${ajv.errorsText(validateConfig.errors)}`
             );
+        checkConn();
         const page404 = await readFile({
             path: config.paths.notFound,
         });
@@ -69,7 +74,7 @@ export class BirdAdmin extends Server {
         );
         this.app.use(await createRateLimit());
 
-        super.addControllers([new ApiController()]);
+        super.addControllers([Container.get(ApiController)]);
 
         this.app.use(
             "/panel",

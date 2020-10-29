@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { down, up } from "./db";
+import { checkConn, db } from "./db";
 import { BirdAdmin } from "./main";
 const program = new Command();
 
@@ -9,14 +9,22 @@ program
     .command("up")
     .description("Initializes the tables and columns of the database.")
     .action(() => {
-        up();
+        checkConn();
+        db()
+            .migrate.up()
+            .catch(console.error)
+            .finally(() => db().destroy());
     });
 
 program
     .command("down")
     .description("Removes tables and columns from the database!")
     .action(() => {
-        down();
+        checkConn();
+        db()
+            .migrate.down()
+            .catch(console.error)
+            .finally(() => db().destroy());
     });
 
 program

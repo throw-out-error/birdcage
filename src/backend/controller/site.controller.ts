@@ -4,13 +4,16 @@ import { RouteStorage } from "../storage";
 import { log } from "../libs/utils";
 import { Auth } from "../auth";
 import { Route } from "../../shared/api";
-import { Service } from "typedi";
+import { Inject, Service } from "typedi";
 import validator from "validator";
 
 @Service()
 @Controller("routes")
 export class SiteController {
-    constructor(private storage: RouteStorage, private auth: Auth) {}
+    constructor(
+        @Inject(() => RouteStorage) private storage: RouteStorage,
+        @Inject(() => Auth) private auth: Auth
+    ) {}
 
     @Get()
     async getRoutes(req: Request, res: Response) {

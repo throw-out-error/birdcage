@@ -12,7 +12,7 @@ export class RouteStorage {
     }
 
     async getRoutes(): Promise<Route[]> {
-        return (await db.select().from("routes")) ?? [];
+        return (await db().select().from("routes")) ?? [];
     }
 
     private registerRoute(route: Route) {
@@ -42,7 +42,7 @@ export class RouteStorage {
     }
 
     private async removeIRoute(id: number) {
-        await db.del().from("routes").where({ id });
+        await db().del().from("routes").where({ id });
     }
 
     async register(route: Route) {
@@ -55,7 +55,7 @@ export class RouteStorage {
             this.proxy.unregister(route);
         }
         this.registerRoute(route);
-        await db.insert(route).returning("*").into("routes");
+        await db().insert(route).returning("*").into("routes");
     }
 
     async unregister(source: string, target: ITargetOptions) {
