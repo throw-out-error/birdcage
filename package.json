@@ -67,7 +67,7 @@
     "dependencies": {
         "@keyv/sqlite": "^2.0.2",
         "@overnightjs/core": "^1.7.5",
-        "@toes/core": "link:/home/theoparis/core",
+        "@toes/core": "dev",
         "@types/keyv": "^3.1.1",
         "@types/keyv__sqlite": "^2.0.1",
         "ajv": "^6.12.6",
