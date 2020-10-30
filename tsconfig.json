@@ -3,7 +3,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "newLine": "LF",
-        "target": "esnext",
+        "target": "es2019",
         "sourceMap": true,
         "pretty": true,
         "jsx": "react",
