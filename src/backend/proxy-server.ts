@@ -90,9 +90,9 @@ export class BirdServer implements ReverseProxy<BirdServer> {
             if (!route) return this.store.notFound(req, res);
             if (route.target.webroot) {
                 let loc = u.pathname ?? "index/";
-                if (u.pathname === "/" || u.pathname === "") loc = "index/";
+                if (u.pathname === "/" || u.pathname === "") loc = "index";
                 if (!loc.match(/\.[0-9a-z]+$/i)) loc = loc + ".html";
-                // console.log(loc);
+                console.log(loc);
                 const safePath = path.normalize(loc);
                 const filePath = path.join(route.target.webroot, safePath);
                 // console.log(filePath);
