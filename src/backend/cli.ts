@@ -11,7 +11,7 @@ program
     .action(() => {
         checkConn();
         db.migrate
-            .up()
+            .latest()
             .catch(console.error)
             .finally(() => db.destroy());
     });

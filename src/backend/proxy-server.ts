@@ -68,7 +68,6 @@ export class BirdServer implements ReverseProxy<BirdServer> {
 
     init() {
         const proxy = httpProxy.createProxyServer();
-        const isStatic = new RegExp(/\/static\/(.*)/);
 
         this.app.use((req, res, next) => {
             const route = this.routes.find(
@@ -90,7 +89,11 @@ export class BirdServer implements ReverseProxy<BirdServer> {
             // console.log(route);
             if (!route) return this.store.notFound(req, res);
             if (route.target.webroot) {
-                const safePath = path.normalize(u.pathname ?? "");
+                let loc = u.pathname ?? "index/";
+                if (u.pathname === "/" || u.pathname === "") loc = "index/";
+                if (!loc.match(/\.[0-9a-z]+$/i)) loc = loc + ".html";
+                // console.log(loc);
+                const safePath = path.normalize(loc);
                 const filePath = path.join(route.target.webroot, safePath);
                 // console.log(filePath);
                 const exists = fs.existsSync(filePath);
@@ -101,7 +104,9 @@ export class BirdServer implements ReverseProxy<BirdServer> {
                     );
                     return res.sendFile(filePath);
                 } else {
-                    return this.store.notFound(req, res);
+                    if (fs.existsSync(filePath + ".html"))
+                        return res.sendFile(filePath + ".html");
+                    else return this.store.notFound(req, res);
                 }
             } else {
                 if (!route.target.proxyUri)

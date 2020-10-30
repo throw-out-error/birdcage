@@ -33,7 +33,8 @@ export class SiteController {
                     `Invalid request! Make sure you have filled out all required fields.`
                 );
             const validation: boolean =
-                validator.isFQDN(r.source) &&
+                (validator.isFQDN(r.source) ||
+                    r.source.includes("localhost")) &&
                 validator.isLength(r.source, { min: 1 });
             if (!validation)
                 throw new Error(
