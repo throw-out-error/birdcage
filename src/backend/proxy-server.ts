@@ -67,7 +67,6 @@ export class BirdServer implements ReverseProxy<BirdServer> {
     }
 
     init() {
-        const port = this.store.httpPort || 9000;
         const proxy = httpProxy.createProxyServer();
         const isStatic = new RegExp(/\/static\/(.*)/);
 
@@ -90,12 +89,10 @@ export class BirdServer implements ReverseProxy<BirdServer> {
             );
             // console.log(route);
             if (!route) return this.store.notFound(req, res);
-            const match = isStatic.exec(u.pathname ?? "/");
-            if (match && route.target.webroot) {
-                const safePath = path
-                    .normalize(match[1])
-                    .replace(/^(\.\.(\/|\\|$))+/, "");
+            if (route.target.webroot) {
+                const safePath = path.normalize(u.pathname ?? "");
                 const filePath = path.join(route.target.webroot, safePath);
+                // console.log(filePath);
                 const exists = fs.existsSync(filePath);
                 if (exists) {
                     res.setHeader(

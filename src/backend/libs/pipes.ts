@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express-serve-static-core";
+/* import { Router, Request, Response } from "express-serve-static-core";
 import { Spring } from "plumbing-toolkit";
 
 export type ReqRes = { req: Request; res: Response };
@@ -13,3 +13,4 @@ export function GET(app: Router, path: "string"): Spring<ReqRes> {
         return () => null;
     };
 }
+ */
