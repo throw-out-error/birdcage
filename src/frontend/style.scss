@@ -258,6 +258,7 @@ body {
                             $row-height $row-height calc(#{$row-height} / 1fr)
                             1fr $row-height;
                         min-height: calc(#{$row-height});
+                        max-height: calc(#{$row-height} * 2);
                         transition: height 0.2s;
                         width: 100%;
                         overflow: hidden;
@@ -273,6 +274,8 @@ body {
                                     #{$row-height} / 1fr
                                 )
                                 1fr;
+                            height: auto;
+                            max-height: none;
                         }
 
                         .only-expanded {
@@ -281,7 +284,9 @@ body {
                         }
 
                         &.expanded {
-                            min-height: calc(#{$row-height} * 4);
+                            min-height: calc(#{$row-height} * 2);
+                            height: auto;
+                            max-height: none;
                             .only-expanded {
                                 opacity: 1;
                             }
