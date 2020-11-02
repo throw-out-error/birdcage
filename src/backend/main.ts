@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { ajv, config, validateConfig } from "./libs/config";
+import { config, loadCfg } from "./libs/config";
 import express from "express";
 import { static as serveStatic } from "express";
 import session = require("express-session");
@@ -12,7 +12,7 @@ import { Auth } from "./auth";
 import { Container } from "typedi";
 import { Server } from "@overnightjs/core";
 import { ApiController } from "./controller/api.controller";
-import { checkConn, db } from "./db";
+import { checkConn } from "./db";
 
 export class BirdAdmin extends Server {
     proxy!: BirdServer;
@@ -27,11 +27,7 @@ export class BirdAdmin extends Server {
     }
 
     async init(): Promise<void> {
-        const valid = validateConfig(config);
-        if (!valid)
-            throw new Error(
-                `Invalid config: ${ajv.errorsText(validateConfig.errors)}`
-            );
+        loadCfg();
         checkConn();
         const page404 = await readFile({
             path: config.paths.notFound,
@@ -41,7 +37,6 @@ export class BirdAdmin extends Server {
         await auth.load();
 
         this.proxy = new BirdServer({
-            httpPort: config.ports.http,
             auth: async (route, req) => {
                 if (!route || !route.auth) return true;
                 if (!req.headers.authorization) return false;
@@ -100,15 +95,7 @@ export class BirdAdmin extends Server {
                 `Admin Panel listening on port ${config.ports.admin}.`
             );
 
-            this.proxy.app.listen(config.ports.http, async () => {
-                log.main.info(
-                    `HTTP Proxy listening on port ${config.ports.http}.`
-                );
-                log.main.info(
-                    `HTTPS Proxy listening on port ${config.ports.https}.`
-                );
-                log.main.info("Server started.");
-            });
+            this.proxy.listen();
         });
     }
 }

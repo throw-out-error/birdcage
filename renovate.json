@@ -1,5 +1,10 @@
 {
-    "extends": ["config:base"],
+    "extends": [
+        "config:base",
+        ":preserveSemverRanges",
+        ":ignoreUnstable",
+        ":respectLatest"
+    ],
     "includePaths": ["package.json"],
     "schedule": ["every weekend"],
     "includeForks": true

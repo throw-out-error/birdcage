@@ -1,17 +1,15 @@
 import yaml from "yaml";
 import { existsSync, writeFileSync } from "fs";
 import { IRateLimiterOptions } from "rate-limiter-flexible";
-import Ajv from "ajv";
+import Joi from "joi";
 import { loadConfiguration } from "@toes/core";
-
+import cryptoRandomString from "crypto-random-string";
 export interface Config {
     ports: {
         http: number;
         https: number;
-        letsencrypt: number;
         admin: number;
     };
-    certificates: string;
     paths: {
         notFound: string;
         database?: string;
@@ -24,61 +22,53 @@ export interface Config {
     apiLimits: IRateLimiterOptions;
 }
 
-export const configSchema = {
-    properties: {
-        paths: {
-            type: "object",
-            properties: {
-                notFound: { type: "string" },
-            },
-        },
-        secrets: {
-            type: "object",
-            properties: {
-                session: { type: "string" },
-                adminPassword: { type: "string" },
-            },
-        },
-        apiLimits: {
-            type: "object",
-            properties: {
-                points: {
-                    type: "number",
-                },
-                duration: {
-                    type: "number",
-                },
-            },
-        },
-        ports: {
-            type: "object",
-            properties: {
-                http: {
-                    type: "number",
-                },
-                admin: {
-                    type: "number",
-                },
-            },
-        },
-    },
-};
+export const configSchema = Joi.object({
+    paths: Joi.object({
+        notFound: Joi.string().required(),
+    }),
+    secrets: Joi.object({
+        session: Joi.string()
+            .required()
+            .default(cryptoRandomString({ length: 12 })),
+        adminPassword: Joi.string()
+            .required()
+            .default(cryptoRandomString({ length: 20 })),
+    }),
+    apiLimits: Joi.object({
+        points: Joi.number().required().default(75),
+        duration: Joi.number().required().default(1),
+    }),
+    ports: Joi.object({
+        http: Joi.number().required().default(80),
+        https: Joi.number().required().default(443),
+        admin: Joi.number().default(3330),
+    }),
+});
 
-export const ajv = new Ajv({ allErrors: true });
-export const validateConfig = ajv.compile(configSchema);
+export const validateConfig = configSchema.validate;
 
 export const env = process.env.NODE_ENV === "production" ? "prod" : "dev";
 export const cfgPath = `config/${env}.yml`;
 
-export const loadCfg = (): Config =>
-    (config = loadConfiguration<Config>({
+export const loadCfg = (): Config => {
+    config = loadConfiguration<Config>({
         env,
-        defaultConfig: "config/example.yml",
-    }));
+        defaultConfig: {},
+    });
+    const res = validateConfig(config);
+    if (res.error) throw new Error("Invalid config!");
+    else {
+        config = res.value;
+        writeCfg();
+        return config;
+    }
+};
 
-export const writeCfg = (): void =>
-    writeFileSync(cfgPath, yaml.stringify(config), { encoding: "utf-8" });
+export const writeCfg = (cfg?: Config): void =>
+    writeFileSync(cfgPath, yaml.stringify(cfg ?? config), {
+        encoding: "utf-8",
+    });
 
-export let config: Config = loadCfg();
+export let config: Config;
 // console.log(config);
 if (!existsSync(cfgPath)) writeCfg();

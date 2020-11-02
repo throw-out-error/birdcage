@@ -8,6 +8,7 @@
  * Then just visit http://localhost:9000/ as you normally would.
  */
 import httpProxy from "http-proxy";
+import AcmeExpress from "acme-middleware";
 import express, { Request, Response, NextFunction } from "express";
 import url from "url";
 import fs from "fs";
@@ -16,9 +17,9 @@ import { Route } from "../shared/api";
 import { log } from "./libs/utils";
 import path from "path";
 import { db } from "./db";
+import { loadCfg } from "./libs/config";
 
 export interface BirdConfig {
-    httpPort?: number;
     notFound: (req: Request, res: Response) => Promise<void>;
     auth: (
         route: Route,
@@ -39,12 +40,13 @@ export interface ReverseProxy<T extends ReverseProxy<T> = BirdServer> {
  * Birdcage proxy server
  */
 export class BirdServer implements ReverseProxy<BirdServer> {
-    store: BirdConfig;
+    private store: BirdConfig;
     routes: Route[];
     app: express.Application;
+    acmeApp?: AcmeExpress;
 
     constructor(opts: BirdConfig) {
-        this.store = { ...opts, httpPort: opts.httpPort ?? 9000 };
+        this.store = opts;
         this.routes = [];
         this.app = express();
 
@@ -106,7 +108,11 @@ export class BirdServer implements ReverseProxy<BirdServer> {
                 } else {
                     if (fs.existsSync(filePath + ".html"))
                         return res.sendFile(filePath + ".html");
-                    else return this.store.notFound(req, res);
+                    else if (fs.existsSync(filePath + ".php")) {
+                        this.app.set("view engine", "php");
+                        this.app.set("views", route.target.webroot);
+                        return res.render(safePath + ".php");
+                    } else return this.store.notFound(req, res);
                 }
             } else {
                 if (!route.target.proxyUri)
@@ -121,5 +127,21 @@ export class BirdServer implements ReverseProxy<BirdServer> {
                 );
             }
         });
+    }
+
+    listen() {
+        this.acmeApp = new AcmeExpress({
+            app: this.app,
+        });
+        const config = loadCfg();
+        const { http, https } = this.acmeApp.listen(
+            { host: "0.0.0.0", port: config.ports.http },
+            ({ host, port }: { host: string; port: number }) => {
+                // this callback will be called 2 times
+                // (1) when http server (your app) started and
+                // (2) when a https server started
+                log.main.info(`Proxy server started at ${host}:${port}`);
+            }
+        );
     }
 }
