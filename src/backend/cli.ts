@@ -1,6 +1,8 @@
 import { Command } from "commander";
 import { checkConn, db } from "./db";
-import { BirdAdmin } from "./main";
+import { PlatformExpress } from "@tsed/platform-express";
+import { BirdAdmin as BirdAdminServer } from "./main";
+import { log } from "./libs/utils";
 const program = new Command();
 
 program.version("1.0.0");
@@ -10,10 +12,10 @@ program
     .description("Initializes the tables and columns of the database.")
     .action(() => {
         checkConn();
-        db.migrate
+        db.instance.migrate
             .latest()
             .catch(console.error)
-            .finally(() => db.destroy());
+            .finally(() => db.instance.destroy());
     });
 
 program
@@ -21,18 +23,24 @@ program
     .description("Removes tables and columns from the database!")
     .action(() => {
         checkConn();
-        db.migrate
+        db.instance.migrate
             .down()
             .catch(console.error)
-            .finally(() => db.destroy());
+            .finally(() => db.instance.destroy());
     });
 
 program
     .command("server")
     .description("Starts birdcage")
-    .action(() => {
+    .action(async () => {
         // Start admin panel server
-        new BirdAdmin();
+        try {
+            const platform = await PlatformExpress.bootstrap(BirdAdminServer, {
+                httpPort: 3330,
+            });
+            await platform.listen();
+        } catch (er) {
+            log.main.error(er);
+        }
     });
-
 program.parse(process.argv);

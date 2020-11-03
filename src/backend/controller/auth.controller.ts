@@ -1,78 +1,106 @@
-import { Controller, Get, Post, Put, Delete } from "@overnightjs/core";
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Delete,
+    Session,
+    BodyParams,
+} from "@tsed/common";
 import { Request, Response } from "express";
 import { log } from "../libs/utils";
 import { Auth } from "../auth";
-import { Inject, Service } from "typedi";
+import { Inject } from "@tsed/common";
+import { UsersService } from "../service/users.service";
+import { IAuthResponse, IResponse } from "../../shared/api";
+import { BadRequest, InternalServerError } from "@tsed/exceptions";
 
 @Controller("auth")
-@Service()
 export class AuthController {
-    constructor(@Inject(() => Auth) private auth: Auth) {}
+    constructor(
+        @Inject(Auth) private auth: Auth,
+        @Inject(UsersService) private users: UsersService
+    ) {}
 
     @Get()
-    async isAuthed(req: Request, res: Response) {
+    async isAuthed(@Session() session): Promise<IAuthResponse> {
         try {
-            let authed = this.auth.checkAuth(req);
-            if (!authed && (await this.auth.checkPassword("")) && req.session) {
-                authed = true;
-                req.session.authed = authed;
-            }
+            const authed = this.auth.checkAuth(session);
 
-            return res.json({ authed });
+            return { authed, success: true };
         } catch (err) {
             log.main.error(`Error getting auth: ${err.toString()}`);
-            return res.status(500).json({ authed: false });
+            throw new InternalServerError(
+                `You were not authenticated: ${err.toString()}`
+            );
         }
     }
 
     @Put()
-    async setPassword(req: Request, res: Response) {
+    async setPassword(
+        @Session() session,
+        @BodyParams() body
+    ): Promise<IResponse> {
         try {
-            const pw = req.body.password;
+            const pw = body.password;
 
-            if (!this.auth.checkAuth(req)) throw new Error("Not logged in!");
+            if (!this.auth.checkAuth(session))
+                throw new Error("Not logged in!");
 
-            await this.auth.setPassword(pw as string);
-            return res.json({ success: true });
+            await this.auth.setPassword(
+                session.username ?? "admin",
+                pw as string
+            );
+            return { success: true };
         } catch (err) {
             log.main.error(`Error setting password: ${err.toString()}`);
-            return res
-                .status(500)
-                .json({ success: false, error: err.toString() });
+            throw new InternalServerError(err.toString());
+        }
+    }
+
+    @Post("signup")
+    async signup(@Session() session, @BodyParams() body): Promise<IResponse> {
+        try {
+            await this.users.addUser(body, this.auth.checkAuth(session));
+            return { success: true };
+        } catch (err) {
+            log.main.error(`Error creating user: ${err.toString()}`);
+            throw new InternalServerError(err.toString());
         }
     }
 
     @Post()
-    async authenticate(req: Request, res: Response) {
-        const pw: string = req.body.password;
+    async authenticate(
+        @Session() session,
+        @BodyParams() body
+    ): Promise<IResponse> {
         try {
-            if (await this.auth.checkPassword(pw)) {
-                if (req.session) req.session.authed = true;
-                return res.json({ success: true });
+            if (await this.auth.checkPassword(body.username, body.password)) {
+                if (session) {
+                    session.authed = true;
+                    session.username = body.username;
+                }
+                return { success: true };
             } else {
-                if (req.session) req.session.authed = false;
-                return res.status(400).json({
-                    success: false,
-                    error: "Wrong password!",
-                });
+                if (session) {
+                    session.authed = false;
+                    delete session.username;
+                }
+                throw new BadRequest("Wrong password!");
             }
         } catch (err) {
             log.main.error(`Error checking password: ${err.toString()}`);
-            return res
-                .status(500)
-                .json({ success: false, error: err.toString() });
+            throw new InternalServerError(err.toString());
         }
     }
 
     @Delete()
-    async logout(req: Request, res: Response) {
-        if (!this.auth.checkAuth(req))
-            return res
-                .status(400)
-                .json({ success: false, error: "Not logged in!" });
+    async logout(@Session() session, @BodyParams() body): Promise<IResponse> {
+        if (!this.auth.checkAuth(session))
+            throw new BadRequest("Not logged in!");
 
-        if (req.session) req.session.authed = false;
+        if (session) session.authed = false;
 
-        return res.json({ success: true });
+        return { success: true };
     }
 }

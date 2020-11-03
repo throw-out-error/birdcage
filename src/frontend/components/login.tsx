@@ -4,12 +4,14 @@ import { Input } from "./input";
 import { OnAuthProps } from "./utils";
 
 interface LoginState {
+    username: string;
     password: string;
 }
 export class Login extends Component<OnAuthProps, LoginState> {
     constructor(props: OnAuthProps) {
         super(props);
         this.state = {
+            username: "",
             password: "",
         };
     }
@@ -19,20 +21,32 @@ export class Login extends Component<OnAuthProps, LoginState> {
         if (data.authed) this.props.onAuth();
     }
 
+    async onSignup() {
+        const { data } = await api.post("/auth/signup", {
+            ...this.state,
+        });
+        if (data.success) this.onLogin();
+        else alert(data.error);
+    }
+
     async onLogin() {
         const { data } = await api.post("/auth", {
-            password: this.state.password,
+            ...this.state,
         });
-        if (data.success) {
-            this.props.onAuth();
-        } else {
-            alert(data.error);
-        }
+        if (data.success) this.props.onAuth();
+        else alert(data.error);
     }
 
     render(props: OnAuthProps, state: LoginState) {
         return (
             <div className="login">
+                <div className="username">
+                    <Input
+                        type="text"
+                        placeholder="Username"
+                        onChanged={(val) => this.setState({ username: val })}
+                    />
+                </div>
                 <div className="password">
                     <Input
                         type="password"
@@ -46,6 +60,13 @@ export class Login extends Component<OnAuthProps, LoginState> {
                     className="btn"
                 >
                     Login
+                </button>
+                <button
+                    type="button"
+                    onClick={this.onSignup.bind(this)}
+                    className="btn"
+                >
+                    Sign Up
                 </button>
             </div>
         );

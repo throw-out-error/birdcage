@@ -1,11 +1,11 @@
 import { db } from "./db";
 import { BirdServer } from "./proxy-server";
 import { Route, ITargetOptions } from "src/shared/api";
-import { Inject, Service } from "typedi";
+import { Inject, Service } from "@tsed/common";
 
 @Service()
 export class RouteStorage {
-    constructor(@Inject(() => BirdServer) private readonly proxy: BirdServer) {}
+    constructor(@Inject(BirdServer) private readonly proxy: BirdServer) {}
 
     async load(): Promise<void> {
         for (const route of await this.getRoutes()) this.registerRoute(route);
@@ -13,7 +13,7 @@ export class RouteStorage {
 
     async getRoutes(): Promise<Route[]> {
         return (
-            (await db("routes").select()).map((r) => ({
+            (await db.instance("routes").select()).map((r) => ({
                 ...r,
                 target: JSON.parse(r.target),
                 auth: r.auth ? JSON.parse(r.auth) : undefined,
@@ -48,7 +48,7 @@ export class RouteStorage {
     }
 
     private async removeRoute(id: number) {
-        await db("routes").where({ id }).del();
+        await db.instance("routes").where({ id }).del();
     }
 
     async register(route: Route) {
@@ -61,7 +61,7 @@ export class RouteStorage {
             this.proxy.reload();
         }
         this.registerRoute(route);
-        await db
+        await db.instance
             .insert({
                 ...route,
                 updatedAt: new Date().toISOString(),

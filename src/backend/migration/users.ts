@@ -2,18 +2,15 @@ import { db } from "../db";
 
 export const up = () => {
     return new Promise<void>((resolve, reject) => {
-        db.instance.schema.hasTable("routes").then((hasTable) => {
+        db.instance.schema.hasTable("users").then((hasTable) => {
             if (!hasTable)
                 db.instance.schema
-                    .createTable("routes", (table) => {
+                    .createTable("users", (table) => {
                         table.increments("id").primary().unsigned();
 
-                        table.string("source", 255).notNullable();
-                        table.jsonb("target").notNullable();
-                        table.boolean("ssl").notNullable();
-                        table.string("username").notNullable();
-
-                        table.jsonb("auth").nullable();
+                        table.string("username", 255).notNullable();
+                        table.string("password").notNullable();
+                        table.string("email").notNullable();
 
                         table
                             .timestamp("createdAt")
@@ -33,10 +30,10 @@ export const up = () => {
 
 export const down = () => {
     return new Promise<void>((resolve, reject) => {
-        db.instance.schema.hasTable("routes").then((hasTable) => {
+        db.instance.schema.hasTable("users").then((hasTable) => {
             if (hasTable)
                 db.instance.schema
-                    .dropTable("routes")
+                    .dropTable("users")
                     .then(() => {
                         resolve();
                     })

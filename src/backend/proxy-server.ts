@@ -8,7 +8,6 @@
  * Then just visit http://localhost:9000/ as you normally would.
  */
 import httpProxy from "http-proxy";
-import AcmeExpress from "acme-middleware";
 import express, { Request, Response, NextFunction } from "express";
 import url from "url";
 import fs from "fs";
@@ -17,7 +16,9 @@ import { Route } from "../shared/api";
 import { log } from "./libs/utils";
 import path from "path";
 import { db } from "./db";
-import { loadCfg } from "./libs/config";
+import { AcmeExpress } from "@peculiar/acme-express";
+import { ConfigService } from "./service/config.service";
+import { Inject, Opts } from "@tsed/common";
 
 export interface BirdConfig {
     notFound: (req: Request, res: Response) => Promise<void>;
@@ -42,13 +43,16 @@ export interface ReverseProxy<T extends ReverseProxy<T> = BirdServer> {
 export class BirdServer implements ReverseProxy<BirdServer> {
     private store: BirdConfig;
     routes: Route[];
-    app: express.Application;
+    app: express.Express;
+    httpsApp: express.Express;
     acmeApp?: AcmeExpress;
 
-    constructor(opts: BirdConfig) {
+    constructor(
+        @Inject(ConfigService) private config: ConfigService,
+        @Opts opts: BirdConfig
+    ) {
         this.store = opts;
         this.routes = [];
-        this.app = express();
 
         this.reload().then(() => {
             this.init();
@@ -57,7 +61,7 @@ export class BirdServer implements ReverseProxy<BirdServer> {
 
     async reload() {
         this.routes =
-            (await db("routes").select()).map((r) => ({
+            (await db.instance("routes").select()).map((r) => ({
                 ...r,
                 target: JSON.parse(r.target),
                 auth: r.auth ? JSON.parse(r.auth) : undefined,
@@ -76,20 +80,21 @@ export class BirdServer implements ReverseProxy<BirdServer> {
                 (r) => r.source === req.get("host") ?? "example.com"
             );
             if (route && route.auth) {
-                if (this.store.auth(route, req, res, next)) return next();
+                if (this.store.auth(route, req as Request, res, next))
+                    return next();
                 else return res.status(403).send("<h1>Access Denied</h1>");
             } else return next();
         });
 
         // deepcode ignore NoRateLimitingForExpensiveWebOperation: Custom rate limiter implemented
-        this.app.use(async (req, res) => {
+        this.app.use(async (req: Request, res) => {
             const u = url.parse(req.url);
             await this.reload();
             const route = this.routes.find(
                 (r) => r.source === req.get("host") ?? "example.com"
             );
             // console.log(route);
-            if (!route) return this.store.notFound(req, res);
+            if (!route) return this.store.notFound(req as Request, res);
             if (route.target.webroot) {
                 let loc = u.pathname ?? "index/";
                 if (u.pathname === "/" || u.pathname === "") loc = "index";
@@ -127,21 +132,18 @@ export class BirdServer implements ReverseProxy<BirdServer> {
                 );
             }
         });
+        this.httpsApp.use(this.app);
     }
 
-    listen() {
-        this.acmeApp = new AcmeExpress({
-            app: this.app,
+    listen(): Promise<void> {
+        return new Promise((resolve) => {
+            AcmeExpress.register(this.httpsApp, {});
+
+            this.app.listen(this.config.get("HTTP_PORT"), () => {
+                this.httpsApp.listen(this.config.get("HTTPS_PORT"), () => {
+                    resolve();
+                });
+            });
         });
-        const config = loadCfg();
-        const { http, https } = this.acmeApp.listen(
-            { host: "0.0.0.0", port: config.ports.http },
-            ({ host, port }: { host: string; port: number }) => {
-                // this callback will be called 2 times
-                // (1) when http server (your app) started and
-                // (2) when a https server started
-                log.main.info(`Proxy server started at ${host}:${port}`);
-            }
-        );
     }
 }

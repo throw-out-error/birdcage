@@ -1,29 +1,23 @@
-import { config, loadCfg, writeCfg } from "./libs/config";
 import { hash, compare } from "bcrypt";
-import { Service } from "typedi";
 import { Request } from "express";
+import { Inject, Service } from "@tsed/common";
+import { UsersService } from "./service/users.service";
 
 @Service()
 export class Auth {
-    async load(): Promise<void> {
-        loadCfg();
-    }
+    constructor(@Inject(UsersService) private users: UsersService) {}
 
-    checkAuth = (req: Request) => req.session && req.session.authed;
+    checkAuth = (session?: Record<string, unknown>): boolean =>
+        session && session.authed ? true : false;
 
-    async setPassword(pw: string): Promise<boolean> {
-        config.secrets.adminPassword = await hash(pw, 10);
-        writeCfg();
+    async setPassword(username: string, pw: string): Promise<boolean> {
+        const newPassword = await hash(pw, 10);
+        await this.users.updatePassword(username, newPassword);
         return true;
     }
 
-    async checkPassword(pw: string): Promise<boolean> {
-        if (
-            !config.secrets.adminPassword ||
-            config.secrets.adminPassword === ""
-        )
-            return true;
+    async checkPassword(username: string, pw: string): Promise<boolean> {
         if (!pw) return false;
-        return await compare(pw, config.secrets.adminPassword);
+        return await compare(pw, (await this.users.get(username)).password);
     }
 }

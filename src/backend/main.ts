@@ -1,64 +1,103 @@
 import "reflect-metadata";
-import { config, loadCfg } from "./libs/config";
+import { join } from "path";
 import express from "express";
 import { static as serveStatic } from "express";
-import session = require("express-session");
+import session from "express-session";
 import { log, path } from "./libs/utils";
-import { readFile } from "@toes/core";
 import { createRateLimit } from "./middleware/rate-limit";
 import { BirdServer } from "./proxy-server";
-import { RouteStorage } from "./storage";
 import { Auth } from "./auth";
-import { Container } from "typedi";
-import { Server } from "@overnightjs/core";
-import { ApiController } from "./controller/api.controller";
-import { checkConn } from "./db";
+import { checkConn, db } from "./db";
+import Knex from "knex";
+import { ConfigService } from "./service/config.service";
+import {
+    Inject,
+    registerProvider,
+    createContainer,
+    UseOpts,
+    PlatformApplication,
+    Configuration,
+} from "@tsed/common";
+import { RouteStorage } from "./storage";
+import { AuthController } from "./controller/auth.controller";
+import { SiteController } from "./controller/site.controller";
+import { readFile } from "@toes/core";
 
-export class BirdAdmin extends Server {
-    proxy!: BirdServer;
-
-    constructor() {
-        super();
-
-        this.init().catch((err) => {
-            console.error(err);
-            process.exit(1);
-        });
-    }
-
-    async init(): Promise<void> {
-        loadCfg();
-        checkConn();
-        const page404 = await readFile({
-            path: config.paths.notFound,
-        });
-
-        const auth = new Auth();
-        await auth.load();
-
-        this.proxy = new BirdServer({
+registerProvider({
+    provide: BirdServer,
+    deps: [ConfigService],
+    async useAsyncFactory(cfg: ConfigService, app: BirdAdmin) {
+        return new BirdServer(cfg, {
             auth: async (route, req) => {
                 if (!route || !route.auth) return true;
                 if (!req.headers.authorization) return false;
-                return auth.checkPassword(req.headers["authorization"]);
+                // TODO: finish route auth
+                /*                         return (Container.get(Auth)).checkPassword(
+        req.headers["authorization"]
+    ); */
+                return true;
             },
             notFound: async (_, res) => {
-                res.send(page404);
+                res.send(
+                    await readFile({
+                        path: (await cfg.get("NOT_FOUND")) ?? "",
+                    })
+                );
             },
         });
+    },
+});
 
-        const routeStorage = new RouteStorage(this.proxy);
-        await routeStorage.load();
+@Configuration({
+    rootDir: `${__dirname}/../../`,
+    acceptMimes: ["application/json"],
+})
+export class BirdAdmin {
+    @Inject()
+    app!: PlatformApplication;
 
-        Container.set(BirdServer, this.proxy);
-        Container.set(Auth, auth);
-        Container.set(RouteStorage, routeStorage);
+    constructor(
+        @Inject(ConfigService) private readonly config: ConfigService,
+        @Inject(RouteStorage) private readonly routeStorage: RouteStorage,
+
+        @Inject(BirdServer) private readonly proxy: BirdServer
+    ) {}
+
+    async $beforeRoutesInit(): Promise<void> {
+        return this.init();
+    }
+
+    async init(): Promise<void> {
+        const dbConfig: Knex.Config<Knex.Sqlite3ConnectionConfig> = {
+            client: "sqlite",
+            connection: {
+                filename: this.config.get("DATABASE_PATH"),
+                database: "birdcage",
+            },
+            useNullAsDefault: true,
+            migrations: {
+                directory: join(__dirname, "migration"),
+                loadExtensions: [".js"],
+            },
+            pool: {
+                min: 0,
+                max: 1,
+            },
+            debug: process.env.DB_DEBUG ? true : false,
+        };
+
+        // Initialize database
+        db.instance = Knex(dbConfig);
+
+        checkConn();
+
+        await this.routeStorage.load();
 
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(
             session({
-                secret: config.secrets.session,
+                secret: this.config.get<string>("SESSION_SECRET") ?? "",
                 resave: false,
                 saveUninitialized: true,
                 cookie: {
@@ -68,9 +107,14 @@ export class BirdAdmin extends Server {
                 },
             })
         );
-        this.app.use(await createRateLimit());
-
-        super.addControllers([Container.get(ApiController)]);
+        this.app.use(
+            await createRateLimit({
+                apiLimits: {
+                    duration: this.config.get("API_LIMIT_DURATION"),
+                    points: this.config.get("API_LIMIT_POINTS"),
+                },
+            })
+        );
 
         this.app.use(
             "/panel",
@@ -84,18 +128,23 @@ export class BirdAdmin extends Server {
         this.app.get("/", (_, res) => {
             res.redirect("/panel");
         });
-
-        this.start();
     }
 
-    start(): void {
-        log.main.info("Starting server...");
-        this.app.listen(process.env.PORT ?? config.ports.admin, async () => {
-            log.main.info(
-                `Admin Panel listening on port ${config.ports.admin}.`
-            );
+    $beforeListen(): void {
+        log.main.info("Starting servers...");
+    }
 
-            this.proxy.listen();
-        });
+    async $afterListen(): Promise<void> {
+        log.main.info(
+            `Admin Panel listening on port ${this.config.get("ADMIN_PORT")}.`
+        );
+        await this.proxy.listen();
+        log.main.info(
+            `HTTP Proxy listening on port ${this.config.get("HTTP_PORT")}.`
+        );
+        log.main.info(
+            `HTTPS Proxy listening on port ${this.config.get("HTTPS_PORT")}.`
+        );
+        log.main.info("Server started.");
     }
 }

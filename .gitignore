@@ -1,11 +1,12 @@
-node_modules
+node_modules/
 .cache
 .parcel-cache
-dist
+dist/
 package-lock.json
 yarn.lock
 .dccache
 *.sqlite
 *.sqlite-journal
-config/*.yml
-!config/example.yml
+config/*.*
+!config/example.*
+data/

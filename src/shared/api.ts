@@ -21,7 +21,10 @@ export interface Site {
 
 export interface IResponse {
     success: boolean;
-    error?: string;
+}
+
+export interface IAuthResponse extends IResponse {
+    authed: boolean;
 }
 
 export interface AdminAPI {
@@ -33,17 +36,28 @@ export interface AdminAPI {
         };
         POST: {
             body: {
+                username: string;
                 password: string;
             };
             response: IResponse;
         };
         PUT: {
             body: {
+                username: string;
                 password: string;
             };
             response: IResponse;
         };
         DELETE: {
+            response: IResponse;
+        };
+    };
+    "/auth/signup": {
+        POST: {
+            body: {
+                username: string;
+                password: string;
+            };
             response: IResponse;
         };
     };
